@@ -62,9 +62,8 @@ class Options {
 			<h1><?php esc_html_e( 'AppPresser OneSignal', 'apppresser-onesignal' ); ?></h1>
 			<form method="post" action="options.php">
 				<?php
-				// This prints out all hidden setting fields.
 				settings_fields( self::OPTION_NAME );
-				do_settings_sections( 'my-setting-admin' );
+				do_settings_sections( self::OPTION_NAME );
 				submit_button();
 				?>
 			</form>
@@ -88,35 +87,35 @@ class Options {
 		);
 
 		add_settings_section(
-			self::OPTION_NAME, // ID
-			'My Custom Settings', // Title
+			self::OPTION_NAME,
+			esc_html__( 'Settings', 'apppresser-onesignal' ),
 			[
 				$this,
 				'print_section_info',
-			], // Callback
-			'my-setting-admin' // Page
+			],
+			self::OPTION_NAME
 		);  
 
 		add_settings_field(
-			'id_number', // ID
-			'ID Number', // Title 
+			'onesignal_api_key',
+			esc_html__( 'OneSignal API Key', 'apppresser-onesignal' ), 
 			[
 				$this,
-				'id_number_callback',
+				'onesignal_api_key_callback',
 			], // Callback
-			'my-setting-admin', // Page
-			'setting_section_id' // Section           
+			self::OPTION_NAME,
+			self::OPTION_NAME
 		);      
 
 		add_settings_field(
-			'title',
-			'Title',
+			'message',
+			esc_html__( 'Message', 'apppresser-onesignal' ),
 			[
 				$this,
-				'title_callback',
+				'message_callback',
 			],
-			'my-setting-admin',
-			'setting_section_id'
+			self::OPTION_NAME,
+			self::OPTION_NAME
 		);      
 	}
 
@@ -128,18 +127,18 @@ class Options {
 	public function sanitize( $input ) {
 		$new_input = array();
 
-		if ( isset( $input['id_number'] ) ) {
-			$new_input['id_number'] = absint( $input['id_number'] );
+		if ( isset( $input['onesignal_api_key'] ) ) {
+			$new_input['onesignal_api_key'] = sanitize_text_field( $input['onesignal_api_key'] );
 		}
 
-		if ( isset( $input['title'] ) ) {
-			$new_input['title'] = sanitize_text_field( $input['title'] );
+		if ( isset( $input['message'] ) ) {
+			$new_input['message'] = sanitize_text_field( $input['message'] );
 		}
 
 		return $new_input;
 	}
 
-	/** 
+	/**
 	 * Print the Section text.
 	 *
 	 * @return void
@@ -149,26 +148,26 @@ class Options {
 	}
 
 	/** 
-	 * Get the settings option array and print one of its values.
+	 * Callback for the API Key.
 	 *
 	 * @return void
 	 */
-	public function id_number_callback() {
+	public function onesignal_api_key_callback() {
 		printf(
-			'<input type="text" id="id_number" name="appp_onesignal[id_number]" value="%s" />',
-			isset( $this->options['id_number'] ) ? esc_attr( $this->options['id_number']) : ''
+			'<input type="text" id="onesignal_api_key" name="appp_onesignal[onesignal_api_key]" value="%s" />',
+			isset( $this->options['onesignal_api_key'] ) ? esc_attr( $this->options['onesignal_api_key'] ) : ''
 		);
 	}
 
 	/** 
-	 * Get the settings option array and print one of its values
+	 * Callback for the message.
 	 *
 	 * @return void
 	 */
-	public function title_callback() {
+	public function message_callback() {
 		printf(
-			'<input type="text" id="title" name="my_option_name[title]" value="%s" />',
-			isset( $this->options['title'] ) ? esc_attr( $this->options['title']) : ''
+			'<input type="text" id="message" name="my_option_name[message]" value="%s" />',
+			isset( $this->options['message'] ) ? esc_attr( $this->options['message']) : ''
 		);
 	}
 }
