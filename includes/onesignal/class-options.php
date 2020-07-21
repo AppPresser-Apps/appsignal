@@ -144,7 +144,7 @@ class Options {
 	 * @return void
 	 */
 	public function print_section_info() {
-		echo 'Enter your settings below:';
+		esc_html_e( 'Enter your API key and Message below.', 'apppresser-onesignal' );
 	}
 
 	/** 
