@@ -64,7 +64,7 @@ class Options {
 				<?php
 				settings_fields( self::OPTION_NAME );
 				do_settings_sections( self::OPTION_NAME );
-				submit_button( 'Save settings and send message.' );
+				submit_button( esc_html__( 'Save settings and send message', 'apppresser-onesignal' ) );
 				?>
 			</form>
 		</div>
@@ -94,7 +94,7 @@ class Options {
 				'print_section_info',
 			],
 			self::OPTION_NAME
-		);  
+		);
 
 		add_settings_field(
 			'onesignal_app_id',
@@ -105,7 +105,7 @@ class Options {
 			], // Callback
 			self::OPTION_NAME,
 			self::OPTION_NAME
-		);      
+		);
 
 		add_settings_field(
 			'message',
@@ -116,23 +116,26 @@ class Options {
 			],
 			self::OPTION_NAME,
 			self::OPTION_NAME
-		);      
+		);
 	}
 
 	/**
 	 * Sanitize each setting field as needed
 	 *
 	 * @param array $input Contains all settings fields as array keys
+	 * @return array       Sanitized settings to save.
 	 */
 	public function sanitize( $input ) {
-		$new_input = array();
+		$new_input = [];
 
-		if ( isset( $input['onesignal_app_id'] ) ) {
+		if ( ! empty( $input['onesignal_app_id'] ) ) {
 			$new_input['onesignal_app_id'] = sanitize_text_field( $input['onesignal_app_id'] );
 		}
 
-		if ( isset( $input['message'] ) ) {
-			$new_input['message'] = sanitize_text_field( $input['message'] );
+		// Send the message if it's set.
+		if ( ! empty( $input['message'] ) && ! empty( $input['onesignal_app_id'] ) ) {
+			$api_class = new API( $input['onesignal_app_id'] );
+			$api_class->send_message( $input['message'] );
 		}
 
 		return $new_input;
@@ -147,26 +150,26 @@ class Options {
 		esc_html_e( 'Enter your API key and Message below.', 'apppresser-onesignal' );
 	}
 
-	/** 
+	/**
 	 * Callback for the API Key.
 	 *
 	 * @return void
 	 */
 	public function onesignal_app_id_callback() {
 		printf(
-			'<input type="text" id="onesignal_app_id" name="appp_onesignal[onesignal_app_id]" value="%s" />',
+			'<input type="text" id="onesignal_app_id" name="appp_onesignal[onesignal_app_id]" value="%1$s" />',
 			isset( $this->options['onesignal_app_id'] ) ? esc_attr( $this->options['onesignal_app_id'] ) : ''
 		);
 	}
 
-	/** 
+	/**
 	 * Callback for the message.
 	 *
 	 * @return void
 	 */
 	public function message_callback() {
 		printf(
-			'<input type="text" id="message" name="my_option_name[message]" value="%s" />',
+			'<textarea id="message" name="appp_onesignal[message]" rows="7" cols="50" type="textarea">%1$s</textarea>',
 			isset( $this->options['message'] ) ? esc_attr( $this->options['message']) : ''
 		);
 	}
