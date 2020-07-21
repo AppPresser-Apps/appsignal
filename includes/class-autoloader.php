@@ -45,7 +45,7 @@ class Autoloader {
 		}
 
 		// Determine what the full filepath is.
-		$filepath = 'includes/' . trailingslashit( $namespace ) . $filename;
+		$filepath = APPPRESSER_ONESIGNAL_DIR . 'includes/' . trailingslashit( $namespace ) . $filename;
 
 		// Include our file.
 		require $filepath;
