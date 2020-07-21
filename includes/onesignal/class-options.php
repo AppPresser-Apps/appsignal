@@ -64,7 +64,7 @@ class Options {
 				<?php
 				settings_fields( self::OPTION_NAME );
 				do_settings_sections( self::OPTION_NAME );
-				submit_button();
+				submit_button( 'Save settings and send message.' );
 				?>
 			</form>
 		</div>
@@ -97,11 +97,11 @@ class Options {
 		);  
 
 		add_settings_field(
-			'onesignal_api_key',
-			esc_html__( 'OneSignal API Key', 'apppresser-onesignal' ), 
+			'onesignal_app_id',
+			esc_html__( 'OneSignal App ID', 'apppresser-onesignal' ), 
 			[
 				$this,
-				'onesignal_api_key_callback',
+				'onesignal_app_id_callback',
 			], // Callback
 			self::OPTION_NAME,
 			self::OPTION_NAME
@@ -127,8 +127,8 @@ class Options {
 	public function sanitize( $input ) {
 		$new_input = array();
 
-		if ( isset( $input['onesignal_api_key'] ) ) {
-			$new_input['onesignal_api_key'] = sanitize_text_field( $input['onesignal_api_key'] );
+		if ( isset( $input['onesignal_app_id'] ) ) {
+			$new_input['onesignal_app_id'] = sanitize_text_field( $input['onesignal_app_id'] );
 		}
 
 		if ( isset( $input['message'] ) ) {
@@ -152,10 +152,10 @@ class Options {
 	 *
 	 * @return void
 	 */
-	public function onesignal_api_key_callback() {
+	public function onesignal_app_id_callback() {
 		printf(
-			'<input type="text" id="onesignal_api_key" name="appp_onesignal[onesignal_api_key]" value="%s" />',
-			isset( $this->options['onesignal_api_key'] ) ? esc_attr( $this->options['onesignal_api_key'] ) : ''
+			'<input type="text" id="onesignal_app_id" name="appp_onesignal[onesignal_app_id]" value="%s" />',
+			isset( $this->options['onesignal_app_id'] ) ? esc_attr( $this->options['onesignal_app_id'] ) : ''
 		);
 	}
 
