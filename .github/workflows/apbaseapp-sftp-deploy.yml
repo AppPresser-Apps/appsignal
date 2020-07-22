@@ -34,3 +34,4 @@ jobs:
         remote_path: wp-content/plugins/apppresser-onesignal
         args: '-o ConnectTimeout=5'
         ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}
+        port: 2222
