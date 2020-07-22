@@ -111,6 +111,17 @@ class Options {
 		);
 
 		add_settings_field(
+			'onesignal_rest_api_key',
+			esc_html__( 'OneSignal REST API KEY', 'apppresser-onesignal' ), 
+			[
+				$this,
+				'onesignal_rest_api_key_callback',
+			], // Callback
+			self::OPTION_NAME,
+			self::OPTION_NAME
+		);
+
+		add_settings_field(
 			'message',
 			esc_html__( 'Message', 'apppresser-onesignal' ),
 			[
@@ -135,8 +146,11 @@ class Options {
 			$new_input['onesignal_app_id'] = sanitize_text_field( $input['onesignal_app_id'] );
 		}
 
-		// Send the message if it's set.
-		if ( ! empty( $input['message'] ) && ! empty( $input['onesignal_app_id'] ) ) {
+		if ( ! empty( $input['onesignal_rest_api_key'] ) ) {
+			$new_input['onesignal_rest_api_key'] = sanitize_text_field( $input['onesignal_rest_api_key'] );
+		}
+
+		if ( ! empty( $input['message'] ) ) {
 			$new_input['message'] = sanitize_text_field( $input['message'] );
 		}
 
@@ -165,6 +179,18 @@ class Options {
 	}
 
 	/**
+	 * Callback for the API Key.
+	 *
+	 * @return void
+	 */
+	public function onesignal_rest_api_key_callback() {
+		printf(
+			'<input type="text" id="onesignal_rest_api_key" name="appp_onesignal[onesignal_rest_api_key]" value="%1$s" />',
+			isset( $this->options['onesignal_rest_api_key'] ) ? esc_attr( $this->options['onesignal_rest_api_key'] ) : ''
+		);
+	}
+
+	/**
 	 * Callback for the message.
 	 *
 	 * @return void
@@ -182,14 +208,13 @@ class Options {
 	 */
 	public function maybe_send_message() {
 		// Bail early if no App ID and message.
-		if ( empty( $this->options['onesignal_app_id'] ) || empty( $this->options['message'] ) ) {
+		if ( empty( $this->options['onesignal_app_id'] ) || empty( $this->options['onesignal_rest_api_key'] ) || empty( $this->options['message'] ) ) {
 			return;
 		}
 
 		// Attempt to send the message through the OneSignal API.
-		$api_class = new API( $this->options['onesignal_app_id'] );
-		$api_class->send_message( $this->options['message'] );
-
+		$api_class = new API( $this->options['onesignal_app_id'], $this->options['onesignal_rest_api_key'] );
+		$response  = $api_class->send_message( $this->options['message'] );
 		?>
 		<div class="notice notice-success is-dismissible">
 			<p><?php echo esc_html_e( 'Message successfully sent!', 'apppresser-onesignal' ); ?></p>
