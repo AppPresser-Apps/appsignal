@@ -11,26 +11,18 @@
       }
     ],
     "require": {
-        "wpackagist-plugin/cmb2":"2.7.0"
-
-    },
-    "require-dev": {
-      "wpackagist-plugin/debug-bar": "*",
-      "wpackagist-plugin/debug-bar-console": "*",
-      "wpackagist-plugin/debug-bar-slow-actions": "*",
-      "wpackagist-plugin/debug-bar-cron": "*",
+        "cmb2/cmb2": "^2.2"
     },
     "extra": {
       "installer-paths": {
-        "themes/{$name}": [
-          "type:wordpress-theme"
-        ],
-        "plugins/{$name}": [
-          "type:wordpress-plugin"
-        ],
-        "mu-plugins/{$name}": [
-          "type:wordpress-muplugin"
+        "vendor/cmb2/cmb2": [
+            "cmb2/cmb2"
         ]
       }
+    },
+    "autoload": {
+        "files": [
+            "vendor/cmb2/cmb2/init.php"
+        ]
     }
   }
