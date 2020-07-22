@@ -216,9 +216,20 @@ class Options {
 		$api_class = new API( $this->options['onesignal_app_id'], $this->options['onesignal_rest_api_key'] );
 		$response  = $api_class->send_message( $this->options['message'] );
 		?>
-		<div class="notice notice-success is-dismissible">
-			<p><?php echo esc_html_e( 'Message successfully sent!', 'apppresser-onesignal' ); ?></p>
-		</div>
+
 		<?php
+		if ( $response ) :
+			?>
+			<div class="notice notice-success is-dismissible">
+				<p><?php echo esc_html_e( 'Message successfully sent!', 'apppresser-onesignal' ); ?></p>
+			</div>
+			<?php
+		else :
+			?>
+			<div class="notice notice-error is-dismissible">
+				<p><?php echo esc_html_e( 'There was an issue sending your message!', 'apppresser-onesignal' ); ?></p>
+			</div>
+			<?php
+		endif;
 	}
 }

@@ -51,6 +51,17 @@ class API {
 	 * @return mixed          API Response;
 	 */
 	public function send_message( string $message, array $options = [] ) {
+		$body = [
+			'app_id'            => $this->app_id,
+			'included_segments' => [
+				'All',
+			],
+			'data'              => [],
+			'contents'          => [
+				'en' => $message,
+			],				
+		];
+
 		$args = [
 			'timeout'     => 60,
 			'redirection' => 5,
@@ -59,26 +70,16 @@ class API {
 			'sslverify'   => false,
 			'data_format' => 'body',
 			'headers'     => [
-				'Content-Type: application/json; charset=utf-8',
-				'Authorization: Basic ' . $this->rest_api_key,
+				'Content-Type'  => 'application/json',
+				'Authorization' => 'Basic ' . $this->rest_api_key,
 			],
-			'body'        => [
-				'app_id'            => $this->app_id,
-				'included_segments' => [
-					'All',
-				],
-				'data'              => [],
-				'contents'          => [
-					'en' => $message,
-				],				
-			],
+			'body'        => wp_json_encode( $body ),
 		];
 
 		$response = wp_remote_post( self::ONESIGNAL_ENDPOINT_URL, $args );
+		$code     = $response['response']['code'] ?? 404;
 
-		echo '<pre>';
-		var_dump( $response );
-		die;
+		return 200 === $code;
 	}
 
 }
