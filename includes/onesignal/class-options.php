@@ -57,6 +57,9 @@ class Options {
 	public function create_admin_page() {
 		// Set class property
 		$this->options = get_option( self::OPTION_NAME );
+
+		// Check to see if a message should be sent.
+		$this->maybe_send_message();
 		?>
 		<div class="wrap">
 			<h1><?php esc_html_e( 'AppPresser OneSignal', 'apppresser-onesignal' ); ?></h1>
@@ -134,8 +137,7 @@ class Options {
 
 		// Send the message if it's set.
 		if ( ! empty( $input['message'] ) && ! empty( $input['onesignal_app_id'] ) ) {
-			$api_class = new API( $input['onesignal_app_id'] );
-			$api_class->send_message( $input['message'] );
+			$new_input['message'] = sanitize_text_field( $input['message'] );
 		}
 
 		return $new_input;
@@ -168,9 +170,30 @@ class Options {
 	 * @return void
 	 */
 	public function message_callback() {
-		printf(
-			'<textarea id="message" name="appp_onesignal[message]" rows="7" cols="50" type="textarea">%1$s</textarea>',
-			isset( $this->options['message'] ) ? esc_attr( $this->options['message']) : ''
-		);
+		?>
+		<textarea id="message" name="appp_onesignal[message]" rows="7" cols="50" type="textarea"></textarea>
+		<?php
+	}
+
+	/**
+	 * Send a message through the API and display a success message.
+	 *
+	 * @return void
+	 */
+	public function maybe_send_message() {
+		// Bail early if no App ID and message.
+		if ( empty( $this->options['onesignal_app_id'] ) || empty( $this->options['message'] ) ) {
+			return;
+		}
+
+		// Attempt to send the message through the OneSignal API.
+		$api_class = new API( $this->options['onesignal_app_id'] );
+		$api_class->send_message( $this->options['message'] );
+
+		?>
+		<div class="notice notice-success is-dismissible">
+			<p><?php echo esc_html_e( 'Message successfully sent!', 'apppresser-onesignal' ); ?></p>
+		</div>
+		<?php
 	}
 }
