@@ -1,0 +1,36 @@
+{
+    "name": "AppPresser OneSignal",
+    "description": "Composer dependencies for the AppPresser OneSignal project.",
+    "type": "root",
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "repositories": [
+      {
+        "type": "composer",
+        "url": "https://wpackagist.org"
+      }
+    ],
+    "require": {
+        "wpackagist-plugin/cmb2":"2.7.0"
+
+    },
+    "require-dev": {
+      "wpackagist-plugin/debug-bar": "*",
+      "wpackagist-plugin/debug-bar-console": "*",
+      "wpackagist-plugin/debug-bar-slow-actions": "*",
+      "wpackagist-plugin/debug-bar-cron": "*",
+    },
+    "extra": {
+      "installer-paths": {
+        "themes/{$name}": [
+          "type:wordpress-theme"
+        ],
+        "plugins/{$name}": [
+          "type:wordpress-plugin"
+        ],
+        "mu-plugins/{$name}": [
+          "type:wordpress-muplugin"
+        ]
+      }
+    }
+  }

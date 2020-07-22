@@ -25,13 +25,9 @@ jobs:
     - name: List output files
       run: ls
 
-    - name: SFTP Deploy
-      uses: wlixcc/SFTP-Deploy-Action@v1.0
+    - name: FTP-Deploy-Action
+      uses: SamKirkland/FTP-Deploy-Action@3.1.1
       with:
-        server: ${{ secrets.FTP_SERVER }}
-        username: ${{ secrets.FTP_USERNAME }}
-        local_path: ./*
-        remote_path: wp-content/plugins/apppresser-onesignal
-        args: '-o ConnectTimeout=5'
-        ssh_private_key: ${{ secrets.SSH_SECRET }}
-        port: 2222
+        ftp-server: ${{ secrets.FTP_SERVER }}:2222/wp-content/plugins/apppresser-onesignal
+        ftp-username: ${{ secrets.FTP_USERNAME }}
+        ftp-password: ${{ secrets.FTP_PASSWORD }}
