@@ -34,4 +34,4 @@ jobs:
         LOCAL_DIR: build
         METHOD: sftp
         PORT: 2222
-        ARGS: --delete
+       #  ARGS: --delete
