@@ -28,6 +28,6 @@ jobs:
     - name: FTP-Deploy-Action
       uses: SamKirkland/FTP-Deploy-Action@3.1.1
       with:
-        ftp-server: ${{ secrets.FTP_SERVER }}:2222/wp-content/plugins/apppresser-onesignal
+        ftp-server: sftp://${{ secrets.FTP_SERVER }}:2222/wp-content/plugins/apppresser-onesignal
         ftp-username: ${{ secrets.FTP_USERNAME }}
         ftp-password: ${{ secrets.FTP_PASSWORD }}
