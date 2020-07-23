@@ -18,12 +18,23 @@
  * Domain Path: languages
  */
 
-// Include and register the autoloader.
-require_once 'includes/class-autoloader.php';
-spl_autoload_register( '\AppPresser\OneSignal\Autoloader::autoload_classes' );
-
 define( 'APPPRESSER_ONESIGNAL_DIR', trailingslashit( dirname( __FILE__ ) ) );
 
+// Load the composer autoloader if it exists.
+if ( file_exists( APPPRESSER_ONESIGNAL_DIR . 'vendor/autoload.php' ) ) {
+	require_once APPPRESSER_ONESIGNAL_DIR . 'vendor/autoload.php';
+}
+
+// Include required files.
+require_once APPPRESSER_ONESIGNAL_DIR . 'vendor/cmb2/cmb2/init.php';
+require_once APPPRESSER_ONESIGNAL_DIR . 'includes/class-registration-interface.php';
+require_once APPPRESSER_ONESIGNAL_DIR . 'includes/class-options.php';
+require_once APPPRESSER_ONESIGNAL_DIR . 'includes/class-api.php';
+
 if ( is_admin() ) {
-	new AppPresser\OneSignal\Options();
+	$options_page = new AppPresser\OneSignal\Options();
+
+	if ( $options_page->can_register() ) {
+		$options_page->register();
+	}
 }
