@@ -26,7 +26,6 @@ if ( file_exists( APPPRESSER_ONESIGNAL_DIR . 'vendor/autoload.php' ) ) {
 }
 
 // Include required files.
-require_once APPPRESSER_ONESIGNAL_DIR . 'vendor/cmb2/cmb2/init.php';
 require_once APPPRESSER_ONESIGNAL_DIR . 'includes/class-registration-interface.php';
 require_once APPPRESSER_ONESIGNAL_DIR . 'includes/class-options.php';
 require_once APPPRESSER_ONESIGNAL_DIR . 'includes/class-api.php';
@@ -34,6 +33,7 @@ require_once APPPRESSER_ONESIGNAL_DIR . 'includes/class-api.php';
 if ( is_admin() ) {
 	$options_page = new AppPresser\OneSignal\Options();
 
+	// Register the options page if necessary.
 	if ( $options_page->can_register() ) {
 		$options_page->register();
 	}

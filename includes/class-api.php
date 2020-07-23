@@ -56,7 +56,6 @@ class API {
 			'included_segments' => [
 				'All',
 			],
-			'data'              => [],
 			'contents'          => [
 				'en' => $message,
 			],				

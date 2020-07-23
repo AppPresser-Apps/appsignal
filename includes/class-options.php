@@ -49,24 +49,17 @@ class Options implements RegistrationInterface {
 		 */
 		$cmb_options = \new_cmb2_box(
 			[
-				'id'           => 'apppresser_onesignal_metabox',
+				'id'           => self::OPTION_NAME . '_metabox',
 				'title'        => esc_html__( 'AppPresser OneSignal', 'apppresser-onesignal' ),
-				'object_types' => [ 'options-page' ],
-
-				/*
-				* The following parameters are specific to the options-page box
-				* Several of these parameters are passed along to add_menu_page()/add_submenu_page().
-				*/
-
-				'option_key'   => 'apppresser_onesignal', // The option key and admin menu page slug.
-				// 'icon_url'        => 'dashicons-palmtree', // Menu icon. Only applicable if 'parent_slug' is left empty.
-				// 'menu_title'      => esc_html__( 'Options', 'myprefix' ), // Falls back to 'title' (above).
-				// 'parent_slug'     => 'themes.php', // Make options page a submenu item of the themes menu.
-				// 'capability'      => 'manage_options', // Cap required to view options-page.
-				// 'position'        => 1, // Menu position. Only applicable if 'parent_slug' is left empty.
-				// 'admin_menu_hook' => 'network_admin_menu', // 'network_admin_menu' to add network-level options page.
-				// 'display_cb'      => false, // Override the options-page form output (CMB2_Hookup::options_page_output()).
-				// 'save_button'     => esc_html__( 'Save Theme Options', 'myprefix' ), // The text for the options-page save button. Defaults to 'Save'.
+				'object_types' => [
+					'options-page',
+				],
+				'option_key'   => self::OPTION_NAME,
+				'icon_url'     => 'dashicons-megaphone',
+				'capability'   => 'manage_options',
+				'position'     => 1,
+				'save_button'  => esc_html__( 'Save settings and send message', 'apppresser-onesignal' ),
+				'message_cb'   => [ $this, 'message_cb' ],
 			]
 		);
 
@@ -104,34 +97,30 @@ class Options implements RegistrationInterface {
 	}
 
 	/**
-	 * Send a message through the API and display a success message.
+	 * Message callback for the metabox.
 	 *
 	 * @return void
 	 */
-	public function maybe_send_message() {
-		// Bail early if no App ID and message.
-		if ( empty( $this->options['onesignal_app_id'] ) || empty( $this->options['onesignal_rest_api_key'] ) || empty( $this->options['message'] ) ) {
-			return;
+	public function message_cb( \CMB2 $cmb2, array $args = [] ) {
+		$options = get_option( self::OPTION_NAME );
+
+		if ( empty( $options['onesignal_app_id'] ) || empty( $options['onesignal_rest_api_key'] ) || empty( $options['onesignal_message'] ) ) {
+			return $cmb2;
 		}
 
 		// Attempt to send the message through the OneSignal API.
-		$api_class = new API( $this->options['onesignal_app_id'], $this->options['onesignal_rest_api_key'] );
-		$response  = $api_class->send_message( $this->options['message'] );
-		?>
+		$api_class = new API( $options['onesignal_app_id'], $options['onesignal_rest_api_key'] );
+		$response  = $api_class->send_message( $options['onesignal_message'] );
 
-		<?php
-		if ( $response ) :
-			?>
-			<div class="notice notice-success is-dismissible">
-				<p><?php echo esc_html_e( 'Message successfully sent!', 'apppresser-onesignal' ); ?></p>
-			</div>
-			<?php
-		else :
-			?>
-			<div class="notice notice-error is-dismissible">
-				<p><?php echo esc_html_e( 'There was an issue sending your message!', 'apppresser-onesignal' ); ?></p>
-			</div>
-			<?php
-		endif;
+		// Set the message.
+		if ( $response ) {
+			add_settings_error( self::OPTION_NAME . '-notices', 'success', esc_html__( 'Message successfully sent!', 'apppresser-onesignal' ), 'updated' );
+
+			// Update the option.
+			unset( $options['onesignal_message'] );
+			update_option( self::OPTION_NAME, $options );
+		} else {
+			add_settings_error( self::OPTION_NAME . '-notices', 'error', esc_html__( 'Message failed to be sent!', 'apppresser-onesignal' ), 'error' );
+		}
 	}
 }
