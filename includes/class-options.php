@@ -50,7 +50,7 @@ class Options implements RegistrationInterface {
 		$cmb_options = \new_cmb2_box(
 			[
 				'id'           => self::OPTION_NAME . '_metabox',
-				'title'        => esc_html__( 'AppPresser OneSignal', 'apppresser-onesignal' ),
+				'title'        => esc_html__( 'AppSignal', 'apppresser-onesignal' ),
 				'object_types' => [
 					'options-page',
 				],
