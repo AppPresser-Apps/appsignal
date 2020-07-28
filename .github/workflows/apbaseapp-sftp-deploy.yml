@@ -1,40 +1,63 @@
-# This is a basic workflow to help you get started with Actions
+# # This is a basic workflow to help you get started with Actions
 
-name: CI
+# name: CI
 
-# Controls when the action will run. Triggers the workflow on push or pull request
-# events but only for the master branch
-on:
-  push:
-    branches: [ master ]
-  pull_request:
-    branches: [ master ]
+# # Controls when the action will run. Triggers the workflow on push or pull request
+# # events but only for the master branch
+# on:
+#   push:
+#     branches: [ master ]
+#   pull_request:
+#     branches: [ master ]
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+# # A workflow run is made up of one or more jobs that can run sequentially or in parallel
+# jobs:
+#   # This workflow contains a single job called "build"
+#   build:
+#     # The type of runner that the job will run on
+#     runs-on: ubuntu-latest
+
+#     # Steps represent a sequence of tasks that will be executed as part of the job
+#     steps:
+#     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+#     - uses: actions/checkout@v2
+
+#     - name: List output files
+#       run: ls
+
+#     - name: Install Composer Dependencies
+#       run: composer install --no-dev
+
+#     - name: SFTP Deploy
+#       uses: wlixcc/SFTP-Deploy-Action@v1.0
+#       with:
+#         server: ${{ secrets.FTP_SERVER }}
+#         username: ${{ secrets.FTP_USERNAME }}
+#         local_path: ./*
+#         remote_path: wp-content/plugins/apppresser-onesignal
+#         args: '-o ConnectTimeout=5'
+#         ssh_private_key: ${{ secrets.SSH_SECRET }}
+#         port: 2222
+
+
+on: push
+  branches: [ master ]
+name: Publish Website
 jobs:
-  # This workflow contains a single job called "build"
-  build:
-    # The type of runner that the job will run on
+  FTP-Deploy-Action:
+    name: FTP-Deploy-Action
     runs-on: ubuntu-latest
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-    - uses: actions/checkout@v2
-
-    - name: List output files
-      run: ls
-
-    - name: Install Composer Dependencies
-      run: composer install --no-dev
-
-    - name: SFTP Deploy
-      uses: wlixcc/SFTP-Deploy-Action@v1.0
+    - uses: actions/checkout@v2.1.0
       with:
-        server: ${{ secrets.FTP_SERVER }}
-        username: ${{ secrets.FTP_USERNAME }}
+        fetch-depth: 2
+    - name: FTP-Deploy-Action
+      uses: SamKirkland/FTP-Deploy-Action@3.1.1
+      with:
+        ftp-server: ${{ secrets.FTP_SERVER }}
+        ftp-username: ${{ secrets.FTP_USERNAME }}
+        ftp-password: ${{ secrets.FTP_PASSWORD }}
         local_path: ./*
         remote_path: wp-content/plugins/apppresser-onesignal
         args: '-o ConnectTimeout=5'
-        ssh_private_key: ${{ secrets.SSH_SECRET }}
         port: 2222
