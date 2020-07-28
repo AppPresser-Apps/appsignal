@@ -30,6 +30,9 @@ require_once APPPRESSER_ONESIGNAL_DIR . 'includes/class-registration-interface.p
 require_once APPPRESSER_ONESIGNAL_DIR . 'includes/class-options.php';
 require_once APPPRESSER_ONESIGNAL_DIR . 'includes/class-api.php';
 
+require_once APPPRESSER_ONESIGNAL_DIR . 'includes/functions.php';
+require_once APPPRESSER_ONESIGNAL_DIR . 'includes/hooks.php';
+
 if ( is_admin() ) {
 	$options_page = new AppPresser\OneSignal\Options();
 

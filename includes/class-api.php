@@ -58,7 +58,47 @@ class API {
 			],
 			'contents'          => [
 				'en' => $message,
-			],				
+			],
+		];
+
+		$args = [
+			'timeout'     => 60,
+			'redirection' => 5,
+			'blocking'    => true,
+			'httpversion' => '1.0',
+			'sslverify'   => false,
+			'data_format' => 'body',
+			'headers'     => [
+				'Content-Type'  => 'application/json',
+				'Authorization' => 'Basic ' . $this->rest_api_key,
+			],
+			'body'        => wp_json_encode( $body ),
+		];
+
+		$response = wp_remote_post( self::ONESIGNAL_ENDPOINT_URL, $args );
+		$code     = $response['response']['code'] ?? 404;
+
+		return 200 === $code;
+	}
+
+	/**
+	 * Sends a push notificiation to a specific device or devices using the OneSignal API.
+	 *
+	 * @param string $message The message to send.
+	 * @param string $header Message header.
+	 * @param array  $options Options for sending the message.
+	 * @return mixed          API Response;
+	 */
+	public function send_message_to_device( string $message, string $header, array $options = [] ) {
+		$body = [
+			'app_id'                    => $this->app_id,
+			'include_external_user_ids' => $options['users'] ?? [],
+			'contents'                  => [
+				'en' => $message,
+			],
+			'headings'                  => [
+				'en' => $header,
+			],
 		];
 
 		$args = [
