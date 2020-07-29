@@ -15,17 +15,51 @@ use AppPresser\OneSignal;
  */
 function appsig_notification_push( $args ) {
 
+	//error_log( print_r( $args, true ) );
+
 	$data = [];
 
 	switch ( $args->component_action ) {
 
 		case 'new_message':
 			$data = appsig_format_new_message( $args );
+
+			if ( ! empty( $data ) && 1 === $args->is_new ) {
+				AppPresser\OneSignal\appsig_send_message( $data->subject, 'New Message', $data->recipients );
+			}
+
 			break;
 
-	}
-	if ( ! empty( $data ) ) {
-		AppPresser\OneSignal\appsig_send_message( $data->subject, 'New Message', $data->recipients );
+		case 'new_at_mention':
+			if ( 1 === $args->is_new ) {
+
+				$sender = bp_core_get_user_displayname( $args->secondary_item_id );
+
+				AppPresser\OneSignal\appsig_send_message( $sender . ' mentioned you.', 'New Mention', [ $args->user_id ] );
+			}
+
+			break;
+
+		case 'update_reply':
+			if ( 1 === $args->is_new ) {
+
+				$sender = bp_core_get_user_displayname( $args->secondary_item_id );
+
+				AppPresser\OneSignal\appsig_send_message( $sender . ' replied to you.', 'New Reply', [ $args->user_id ] );
+			}
+
+			break;
+
+		case 'friendship_request':
+			if ( 1 === $args->is_new ) {
+
+				$sender = bp_core_get_user_displayname( $args->item_id );
+
+				AppPresser\OneSignal\appsig_send_message( $sender . ' requested friendship.', 'New Friend Request', [ $args->user_id ] );
+			}
+
+			break;
+
 	}
 
 }
@@ -46,6 +80,7 @@ function appsig_format_new_message( $args ) {
 	return $message;
 
 }
+
 
 /**
  * Helper function to get recipeients of a single message of a thread.

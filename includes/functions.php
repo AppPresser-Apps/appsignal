@@ -15,7 +15,7 @@ namespace AppPresser\OneSignal;
  * @param array $user_ids
  * @return void
  */
-function appsig_send_message( string $message, string $header, $user_ids ) {
+function appsig_send_message( string $message, string $header, array $user_ids = [] ) {
 
 	$options = get_option( 'appp_onesignal' );
 
