@@ -17,8 +17,6 @@ function appsig_notification_push( $args ) {
 
 	//error_log( print_r( $args, true ) );
 
-	$data = [];
-
 	switch ( $args->component_action ) {
 
 		case 'new_message':
