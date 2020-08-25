@@ -15,14 +15,17 @@ use AppPresser\OneSignal;
  */
 function appsig_notification_push( $args ) {
 
-	//error_log( print_r( $args, true ) );
+	// error_log( print_r( $args, true ) );
 
 	switch ( $args->component_action ) {
 
 		case 'new_message':
 			$data = appsig_format_new_message( $args );
 
-			if ( ! empty( $data ) && 1 === $args->is_new ) {
+			$has_sent_notification = appsig_get_message_meta_by_value( $data->thread_id );
+
+			if ( ! empty( $data ) && 1 === $args->is_new && ! $has_sent_notification ) {
+				bp_messages_add_meta( $args->item_id, 'has_sent_notification', $data->thread_id );
 				AppPresser\OneSignal\appsig_send_message( $data->subject, 'New Message', $data->recipients );
 			}
 
@@ -73,7 +76,7 @@ function appsig_format_new_message( $args ) {
 
 	$message = new BP_Messages_Message( $args->item_id );
 
-	$message->recipients = get_recipients( $message->sender_id, $message->thread_id );
+	$message->recipients = appsig_get_recipients( $message->sender_id, $message->thread_id );
 
 	return $message;
 
@@ -87,7 +90,7 @@ function appsig_format_new_message( $args ) {
  * @param integer $thread_id
  * @return array
  */
-function get_recipients( $sender_id = 0, $thread_id = 0 ) {
+function appsig_get_recipients( $sender_id = 0, $thread_id = 0 ) {
 	global $wpdb;
 
 	$bp = buddypress();
@@ -103,4 +106,21 @@ function get_recipients( $sender_id = 0, $thread_id = 0 ) {
 	}
 
 	return $recipients;
+}
+
+
+/**
+ * Get message meta by value.
+ *
+ * @since 1.0.0
+ *
+ * @param  int $value the meta_value.
+ * @return int/boolean The ID of the message if found, otherwise false.
+ */
+function appsig_get_message_meta_by_value( $value = 0 ) {
+	global $wpdb;
+
+	$bp = buddypress();
+
+	return $wpdb->get_var( $wpdb->prepare( "SELECT * FROM {$bp->messages->table_name_meta} WHERE meta_value = %d", $value ) );
 }
