@@ -20,7 +20,7 @@ class Options implements RegistrationInterface {
 	 *
 	 * @var array
 	 */
-	private $options = [];
+	private $options = array();
 
 	/**
 	 * Determines if the object should be registered.
@@ -37,7 +37,7 @@ class Options implements RegistrationInterface {
 	 * @return void
 	 */
 	public function register() {
-		add_action( 'cmb2_admin_init', [ $this, 'add_options_page' ] );
+		add_action( 'cmb2_admin_init', array( $this, 'add_options_page' ) );
 	}
 
 	/**
@@ -48,19 +48,19 @@ class Options implements RegistrationInterface {
 		 * Registers options page menu item and form.
 		 */
 		$cmb_options = \new_cmb2_box(
-			[
+			array(
 				'id'           => self::OPTION_NAME . '_metabox',
 				'title'        => esc_html__( 'AppSignal', 'apppresser-onesignal' ),
-				'object_types' => [
+				'object_types' => array(
 					'options-page',
-				],
+				),
 				'option_key'   => self::OPTION_NAME,
 				'icon_url'     => 'dashicons-megaphone',
 				'capability'   => 'manage_options',
 				'position'     => 1,
 				'save_button'  => esc_html__( 'Save settings and send message', 'apppresser-onesignal' ),
-				'message_cb'   => [ $this, 'message_cb' ],
-			]
+				'message_cb'   => array( $this, 'message_cb' ),
+			)
 		);
 
 		/*
@@ -69,30 +69,40 @@ class Options implements RegistrationInterface {
 		* Prefix is not needed.
 		*/
 		$cmb_options->add_field(
-			[
+			array(
 				'name' => esc_html__( 'OneSignal App ID', 'apppresser-onesignal' ),
 				'desc' => esc_html__( 'The App ID for OneSignal.', 'apppresser-onesignal' ),
 				'id'   => 'onesignal_app_id',
 				'type' => 'text',
-			]
+			)
 		);
 
 		$cmb_options->add_field(
-			[
+			array(
 				'name' => esc_html__( 'OneSignal REST Key', 'apppresser-onesignal' ),
 				'desc' => esc_html__( 'The OneSignal REST Key.', 'apppresser-onesignal' ),
 				'id'   => 'onesignal_rest_api_key',
 				'type' => 'text',
-			]
+			)
 		);
 
 		$cmb_options->add_field(
-			[
-				'name' => esc_html__( 'Message', 'apppresser-onesignal' ),
-				'desc' => esc_html__( 'The message to send as a push notification through the OneSignal API.', 'apppresser-onesignal' ),
+			array(
+				'name' => esc_html__( 'Test Message', 'apppresser-onesignal' ),
+				'desc' => esc_html__( 'Message to send as a push notification through the OneSignal API. FOR TESTING ONLY.', 'apppresser-onesignal' ),
 				'id'   => 'onesignal_message',
 				'type' => 'textarea',
-			]
+			)
+		);
+
+		$cmb_options->add_field(
+			array(
+				'name'    => esc_html__( 'Access', 'apppresser-onesignal' ),
+				'desc'    => esc_html__( 'Choose user roles that can access push notifications.', 'apppresser-onesignal' ),
+				'id'      => 'onesignal_access',
+				'type'    => 'multicheck',
+				'options' => $this->get_roles(),
+			)
 		);
 	}
 
@@ -101,7 +111,7 @@ class Options implements RegistrationInterface {
 	 *
 	 * @return void
 	 */
-	public function message_cb( \CMB2 $cmb2, array $args = [] ) {
+	public function message_cb( \CMB2 $cmb2, array $args = array() ) {
 		$options = get_option( self::OPTION_NAME );
 
 		if ( empty( $options['onesignal_app_id'] ) || empty( $options['onesignal_rest_api_key'] ) || empty( $options['onesignal_message'] ) ) {
@@ -122,5 +132,22 @@ class Options implements RegistrationInterface {
 		} else {
 			add_settings_error( self::OPTION_NAME . '-notices', 'error', esc_html__( 'Message failed to be sent!', 'apppresser-onesignal' ), 'error' );
 		}
+	}
+
+	/**
+	 * Get WP user roles and format for cmb options.
+	 */
+	public function get_roles() {
+
+		global $wp_roles;
+
+		$roles = $wp_roles->roles;
+
+		foreach ( $roles as $role => $value ) {
+			$roles[ $role ] = $value['name'];
+		}
+
+		return $roles;
+
 	}
 }

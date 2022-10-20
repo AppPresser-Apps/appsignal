@@ -15,8 +15,6 @@ use AppPresser\OneSignal;
  */
 function appsig_notification_push( $args ) {
 
-	// error_log( print_r( $args, true ) );
-
 	switch ( $args->component_action ) {
 
 		case 'new_message':
@@ -36,7 +34,7 @@ function appsig_notification_push( $args ) {
 
 				$sender = bp_core_get_user_displayname( $args->secondary_item_id );
 
-				AppPresser\OneSignal\appsig_send_message( $sender . ' mentioned you.', 'New Mention', [ $args->user_id ] );
+				AppPresser\OneSignal\appsig_send_message( $sender . ' mentioned you.', 'New Mention', array( $args->user_id ) );
 			}
 
 			break;
@@ -46,7 +44,7 @@ function appsig_notification_push( $args ) {
 
 				$sender = bp_core_get_user_displayname( $args->secondary_item_id );
 
-				AppPresser\OneSignal\appsig_send_message( $sender . ' replied to you.', 'New Reply', [ $args->user_id ] );
+				AppPresser\OneSignal\appsig_send_message( $sender . ' replied to you.', 'New Reply', array( $args->user_id ) );
 			}
 
 			break;
@@ -56,7 +54,7 @@ function appsig_notification_push( $args ) {
 
 				$sender = bp_core_get_user_displayname( $args->item_id );
 
-				AppPresser\OneSignal\appsig_send_message( $sender . ' requested friendship.', 'New Friend Request', [ $args->user_id ] );
+				AppPresser\OneSignal\appsig_send_message( $sender . ' requested friendship.', 'New Friend Request', array( $args->user_id ) );
 			}
 
 			break;
@@ -84,7 +82,7 @@ function appsig_format_new_message( $args ) {
 
 
 /**
- * Helper function to get recipeients of a single message of a thread.
+ * Helper function to get recipients of a single message of a thread.
  *
  * @param integer $sender_id
  * @param integer $thread_id
@@ -95,7 +93,7 @@ function appsig_get_recipients( $sender_id = 0, $thread_id = 0 ) {
 
 	$bp = buddypress();
 
-	$recipients = [];
+	$recipients = array();
 
 	$results = $wpdb->get_results( $wpdb->prepare( "SELECT user_id FROM {$bp->messages->table_name_recipients} WHERE thread_id = %d", $thread_id ) );
 

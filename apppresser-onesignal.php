@@ -26,12 +26,16 @@ if ( file_exists( APPPRESSER_ONESIGNAL_DIR . 'vendor/autoload.php' ) ) {
 }
 
 // Include required files.
+require_once APPPRESSER_ONESIGNAL_DIR . 'vendor/CMB2-conditional-logic/cmb2-conditional-logic.php';
+require_once APPPRESSER_ONESIGNAL_DIR . 'vendor/CMB2-field-ajax-search/cmb2-field-ajax-search.php';
 require_once APPPRESSER_ONESIGNAL_DIR . 'includes/class-registration-interface.php';
 require_once APPPRESSER_ONESIGNAL_DIR . 'includes/class-options.php';
 require_once APPPRESSER_ONESIGNAL_DIR . 'includes/class-api.php';
 
 require_once APPPRESSER_ONESIGNAL_DIR . 'includes/functions.php';
 require_once APPPRESSER_ONESIGNAL_DIR . 'includes/hooks.php';
+
+require_once APPPRESSER_ONESIGNAL_DIR . 'includes/post-type.php';
 
 if ( is_admin() ) {
 	$options_page = new AppPresser\OneSignal\Options();
