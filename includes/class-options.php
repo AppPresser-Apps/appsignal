@@ -104,6 +104,20 @@ class Options implements RegistrationInterface {
 				'options' => $this->get_roles(),
 			)
 		);
+
+			/*
+		* Options fields ids only need
+		* to be unique within this box.
+		* Prefix is not needed.
+		*/
+		$cmb_options->add_field(
+			array(
+				'name' => esc_html__( 'Github Presonal Access token', 'apppresser-onesignal' ),
+				'desc' => esc_html__( 'Token required for plugin updates.', 'apppresser-onesignal' ),
+				'id'   => 'github_access_token',
+				'type' => 'text',
+			)
+		);
 	}
 
 	/**
@@ -151,3 +165,4 @@ class Options implements RegistrationInterface {
 
 	}
 }
+
