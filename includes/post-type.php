@@ -181,6 +181,8 @@ function appp_push_metaboxes() {
 		)
 	);
 
+	$post_types = apply_filters( 'appsignal_deeplink_post_types', array( 'post' ) );
+
 	$cmb->add_field(
 		array(
 			'name'       => __( 'Deeplink Post', 'cmb2' ),
@@ -192,7 +194,7 @@ function appp_push_metaboxes() {
 				'data-conditional-value' => 'push_post',
 			),
 			'query_args' => array(
-				'post_type'      => array( 'post', 'scheme' ),
+				'post_type'      => $post_types,
 				'posts_per_page' => -1,
 			),
 		)
@@ -209,8 +211,6 @@ add_action( 'cmb2_admin_init', 'appp_push_metaboxes' );
  * @param  CMB2_Metabox object $$cmb      cmb object
  */
 function appp_cmb2_send_push( $post_id, $cmb ) {
-
-	// error_log( print_r( $cmb, true ) );
 
 	?>
 
