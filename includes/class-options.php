@@ -57,7 +57,7 @@ class Options implements RegistrationInterface {
 				'option_key'   => self::OPTION_NAME,
 				'icon_url'     => 'dashicons-megaphone',
 				'capability'   => 'manage_options',
-				'position'     => 1,
+				'position'     => 100,
 				'save_button'  => esc_html__( 'Save settings and send message', 'apppresser-onesignal' ),
 				'message_cb'   => array( $this, 'message_cb' ),
 			)
