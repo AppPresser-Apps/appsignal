@@ -9,7 +9,7 @@
  * Plugin Name: AppSignal
  * Plugin URI: https://apppresser.com
  * Description: AppPresser OneSignal Push Notifications
- * Version: 1.0.5
+ * Version: 1.0.6
  * Author: AppPresser
  * Author URI: https://apppresser.com
  * License: GPL2
@@ -49,8 +49,6 @@ if ( is_admin() ) {
 	function appsig_updater() {
 
 		$access_token = appsig_get_option('github_access_token');
-
-		error_log(print_r($access_token, true));
 	
 		require 'vendor/plugin-update/plugin-update-checker.php';
 		$myUpdateChecker = Puc_v4_Factory::buildUpdateChecker(
@@ -63,7 +61,7 @@ if ( is_admin() ) {
 		$myUpdateChecker->setBranch('master');
 		
 		//Optional: If you're using a private repository, specify the access token like this:
-		$myUpdateChecker->setAuthentication( $access_token );
+		//$myUpdateChecker->setAuthentication( $access_token );
 
 		$myUpdateChecker->getVcsApi()->enableReleaseAssets();
 	}
