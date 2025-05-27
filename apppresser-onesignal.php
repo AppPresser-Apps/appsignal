@@ -49,8 +49,6 @@ if ( is_admin() ) {
 	function appsig_updater() {
 
 		$access_token = appsig_get_option('github_access_token');
-
-		error_log(print_r($access_token, true));
 	
 		require 'vendor/plugin-update/plugin-update-checker.php';
 		$myUpdateChecker = Puc_v4_Factory::buildUpdateChecker(
