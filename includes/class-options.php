@@ -8,6 +8,15 @@
 namespace AppPresser\OneSignal;
 
 class Options implements RegistrationInterface {
+
+	/**
+	 * Get the plugin options.
+	 *
+	 * @return array The plugin options.
+	 */
+	public function get_options() {
+		return get_option( self::OPTION_NAME, array() );
+	}
 	/**
 	 * The option name to save settings.
 	 *
@@ -38,6 +47,8 @@ class Options implements RegistrationInterface {
 	 */
 	public function register() {
 		add_action( 'cmb2_admin_init', array( $this, 'add_options_page' ) );
+		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
+		add_action( 'wp_ajax_appsignal_send_test_message', array( $this, 'ajax_send_test_message' ) );
 	}
 
 	/**
@@ -58,7 +69,7 @@ class Options implements RegistrationInterface {
 				'icon_url'     => 'dashicons-megaphone',
 				'capability'   => 'manage_options',
 				'position'     => 100,
-				'save_button'  => esc_html__( 'Save settings and send message', 'apppresser-onesignal' ),
+				'save_button'  => esc_html__( 'Save Settings', 'apppresser-onesignal' ),
 				'message_cb'   => array( $this, 'message_cb' ),
 			)
 		);
@@ -88,15 +99,6 @@ class Options implements RegistrationInterface {
 
 		$cmb_options->add_field(
 			array(
-				'name' => esc_html__( 'Test Message', 'apppresser-onesignal' ),
-				'desc' => esc_html__( 'Message to send as a push notification through the OneSignal API. FOR TESTING ONLY.', 'apppresser-onesignal' ),
-				'id'   => 'onesignal_message',
-				'type' => 'textarea',
-			)
-		);
-
-		$cmb_options->add_field(
-			array(
 				'name'    => esc_html__( 'Access', 'apppresser-onesignal' ),
 				'desc'    => esc_html__( 'Choose user roles that can access push notifications.', 'apppresser-onesignal' ),
 				'id'      => 'onesignal_access',
@@ -106,9 +108,7 @@ class Options implements RegistrationInterface {
 		);
 
 			/*
-		* Options fields ids only need
-		* to be unique within this box.
-		* Prefix is not needed.
+		* Github Access Token
 		*/
 		$cmb_options->add_field(
 			array(
@@ -118,6 +118,52 @@ class Options implements RegistrationInterface {
 				'type' => 'text',
 			)
 		);
+
+		/*
+		* Post Types Auto Push
+		*/
+		$cmb_options->add_field(
+			array(
+				'name' => esc_html__( 'Post Push', 'apppresser-onesignal' ),
+				'desc' => esc_html__( 'Choose post types to add push metabox.', 'apppresser-onesignal' ),
+				'id'   => 'post_types_auto_push',
+				'type' => 'multicheck',
+				'options' => $this->get_post_types(),
+			)
+		);
+
+		$cmb_options->add_field(
+			array(
+				'name' => esc_html__( 'Testing', 'apppresser-onesignal' ),
+				'desc' => esc_html__( 'Send notifications to testing segment. ', 'apppresser-onesignal' ),
+				'id'   => 'onesignal_testing',
+				'type' => 'checkbox',
+			)
+		);
+
+		/*
+		* OneSignal Segment
+		*/
+		$cmb_options->add_field(
+			array(
+				'name' => esc_html__( 'Segment', 'apppresser-onesignal' ),
+				'desc' => esc_html__( 'Segment to send notifications to. Other segments will be ignored.', 'apppresser-onesignal' ),
+				'id'   => 'onesignal_segment',
+				'type' => 'text',
+			)
+		);
+
+		$cmb_options->add_field(
+			array(
+				'name'       => esc_html__( 'Test Message', 'apppresser-onesignal' ),
+				'desc'       => esc_html__( 'Send a test message to all subscribers.', 'apppresser-onesignal' ),
+				'id'         => 'onesignal_message',
+				'type'       => 'text',
+				'save_field' => false, // Don't save this field to options
+				'after'      => '<button type="button" class="button button-secondary" id="send-test-message">' . esc_html__( 'Send Test Message', 'apppresser-onesignal' ) . '</button>',
+			)
+		);
+
 	}
 
 	/**
@@ -126,26 +172,8 @@ class Options implements RegistrationInterface {
 	 * @return void
 	 */
 	public function message_cb( \CMB2 $cmb2, array $args = array() ) {
-		$options = get_option( self::OPTION_NAME );
-
-		if ( empty( $options['onesignal_app_id'] ) || empty( $options['onesignal_rest_api_key'] ) || empty( $options['onesignal_message'] ) ) {
-			return $cmb2;
-		}
-
-		// Attempt to send the message through the OneSignal API.
-		$api_class = new API( $options['onesignal_app_id'], $options['onesignal_rest_api_key'] );
-		$response  = $api_class->send_message( $options['onesignal_message'] );
-
-		// Set the message.
-		if ( $response ) {
-			add_settings_error( self::OPTION_NAME . '-notices', 'success', esc_html__( 'Message successfully sent!', 'apppresser-onesignal' ), 'updated' );
-
-			// Update the option.
-			unset( $options['onesignal_message'] );
-			update_option( self::OPTION_NAME, $options );
-		} else {
-			add_settings_error( self::OPTION_NAME . '-notices', 'error', esc_html__( 'Message failed to be sent!', 'apppresser-onesignal' ), 'error' );
-		}
+		// This function is intentionally left empty as we don't want to send any message on save
+		// Test messages are now only sent via the AJAX handler when the Send Test Message button is clicked
 	}
 
 	/**
@@ -164,5 +192,63 @@ class Options implements RegistrationInterface {
 		return $roles;
 
 	}
-}
 
+	/**
+	 * Get WP post types and format for cmb options.
+	 */
+	public function get_post_types() {
+		$post_types = get_post_types( array(
+				'public' => true,
+		), 'objects' );
+
+		$options = array();
+		foreach ( $post_types as $post_type ) {
+				$options[ $post_type->name ] = $post_type->labels->singular_name;
+		}
+
+		return $options;
+	}
+
+	/**
+	 * Enqueue admin scripts and styles.
+	 */
+	public function enqueue_scripts() {
+		wp_enqueue_script( 'appsignal-admin', plugins_url( 'assets/js/admin.js', dirname( __FILE__ ) ), array( 'jquery' ), '1.0.0', true );
+		wp_localize_script( 'appsignal-admin', 'appsignal', array(
+			'ajax_url' => admin_url( 'admin-ajax.php' ),
+			'nonce'    => wp_create_nonce( 'appsignal_send_test_message' ),
+		));
+	}
+
+	/**
+	 * AJAX handler for sending test messages.
+	 */
+	public function ajax_send_test_message() {
+		check_ajax_referer( 'appsignal_send_test_message', 'nonce' );
+
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( 'Unauthorized' );
+		}
+
+		$message = isset( $_POST['message'] ) ? sanitize_text_field( $_POST['message'] ) : '';
+
+		if ( empty( $message ) ) {
+			wp_send_json_error( 'Message is required' );
+		}
+
+		$options = get_option( self::OPTION_NAME );
+
+		if ( empty( $options['onesignal_app_id'] ) || empty( $options['onesignal_rest_api_key'] ) ) {
+			wp_send_json_error( 'OneSignal is not properly configured' );
+		}
+
+		$api_class = new API( $options['onesignal_app_id'], $options['onesignal_rest_api_key'] );
+		$response  = $api_class->send_message( $message, '', '', array( 'image' => '' ) );
+
+		if ( $response ) {
+			wp_send_json_success( 'Message successfully sent!' );
+		} else {
+			wp_send_json_error( 'Failed to send message' );
+		}
+	}
+}

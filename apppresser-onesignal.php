@@ -19,6 +19,8 @@
  */
 
 define( 'APPPRESSER_ONESIGNAL_DIR', trailingslashit( dirname( __FILE__ ) ) );
+define( 'APPPRESSER_ONESIGNAL_URL', trailingslashit( plugin_dir_url( __FILE__ ) ) );
+define( 'APPPRESSER_ONESIGNAL_PATH', trailingslashit( plugin_dir_path( __FILE__ ) ) );
 
 // Load the composer autoloader if it exists.
 if ( file_exists( APPPRESSER_ONESIGNAL_DIR . 'vendor/autoload.php' ) ) {
@@ -31,43 +33,61 @@ require_once APPPRESSER_ONESIGNAL_DIR . 'vendor/CMB2-field-ajax-search/cmb2-fiel
 require_once APPPRESSER_ONESIGNAL_DIR . 'includes/class-registration-interface.php';
 require_once APPPRESSER_ONESIGNAL_DIR . 'includes/class-options.php';
 require_once APPPRESSER_ONESIGNAL_DIR . 'includes/class-api.php';
+require_once APPPRESSER_ONESIGNAL_DIR . 'includes/class-post-metabox.php';
+require_once APPPRESSER_ONESIGNAL_DIR . 'includes/class-editor-metabox.php';
 
 require_once APPPRESSER_ONESIGNAL_DIR . 'includes/functions.php';
 require_once APPPRESSER_ONESIGNAL_DIR . 'includes/hooks.php';
 
 require_once APPPRESSER_ONESIGNAL_DIR . 'includes/post-type.php';
 
-if ( is_admin() ) {
-	$options_page = new AppPresser\OneSignal\Options();
+function appsig_init() {
+	if ( is_admin() ) {
+		$options_page = new AppPresser\OneSignal\Options();
 
-	// Register the options page if necessary.
-	if ( $options_page->can_register() ) {
-		$options_page->register();
-	}
-
-
-	function appsig_updater() {
-
-		$access_token = appsig_get_option('github_access_token');
-	
-		require 'vendor/plugin-update/plugin-update-checker.php';
-		$myUpdateChecker = Puc_v4_Factory::buildUpdateChecker(
-			'https://github.com/AppPresser-Apps/AppSignal',
-			__FILE__,
-			'appsignal'
-		);
+		// Register the options page if necessary.
+		if ( $options_page->can_register() ) {
+			$options_page->register();
+		}
 		
-		//Set the branch that contains the stable release.
-		$myUpdateChecker->setBranch('master');
-		
-		//Optional: If you're using a private repository, specify the access token like this:
-		//$myUpdateChecker->setAuthentication( $access_token );
+		// Initialize and register the post metabox (for classic editor)
+		$post_metabox = new AppPresser\OneSignal\PostMetabox( $options_page );
+		if ( $post_metabox->can_register() ) {
+			$post_metabox->register();
+		}
 
-		$myUpdateChecker->getVcsApi()->enableReleaseAssets();
+		// Initialize and register the editor metabox (for block editor)
+		$editor_metabox = new AppPresser\OneSignal\Editor_Metabox( $options_page );
+		if ( $editor_metabox->can_register() ) {
+			$editor_metabox->register();
+		}
+
+
 	}
-	appsig_updater();
 }
+add_action( 'init', 'appsig_init' );
 
+
+function appsig_updater() {
+
+	$access_token = appsig_get_option('github_access_token');
+
+	require 'vendor/plugin-update/plugin-update-checker.php';
+	$myUpdateChecker = Puc_v4_Factory::buildUpdateChecker(
+		'https://github.com/AppPresser-Apps/AppSignal',
+		__FILE__,
+		'appsignal'
+	);
+	
+	//Set the branch that contains the stable release.
+	$myUpdateChecker->setBranch('master');
+	
+	//Optional: If you're using a private repository, specify the access token like this:
+	//$myUpdateChecker->setAuthentication( $access_token );
+
+	$myUpdateChecker->getVcsApi()->enableReleaseAssets();
+}
+appsig_updater();
 
 /**
  * Wrapper function around cmb2_get_option

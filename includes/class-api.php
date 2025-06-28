@@ -53,10 +53,18 @@ class API {
 	 * @return mixed          API Response;
 	 */
 	public function send_message( string $message, string $header = '', string $subtitle = '', array $options = array() ) {
+		$appsig_options = appsig_get_option('all');
+
+		if ( isset( $appsig_options['onesignal_testing'] ) ) {
+			$segment = $appsig_options['onesignal_segment'];
+		} else {
+			$segment = 'all' ;
+		}
+
 		$body = array(
-			'app_id'            => $this->app_id,
-			'included_segments' => array(
-				'All',
+			'app_id'             => $this->app_id,
+			'included_segments'  => array(
+				$segment,
 			),
 			'contents'          => array(
 				'en' => stripslashes( $message ),
@@ -67,11 +75,15 @@ class API {
 			'subtitle'          => array(
 				'en' => stripslashes( $subtitle ),
 			),
-			'ios_attachments'   => array(
-				'id1' => $options['image'],
-			),
-			'big_picture'       => $options['image'],
 		);
+
+		// Only add image-related fields if an image is provided
+		if ( ! empty( $options['image'] ) ) {
+			$body['ios_attachments'] = array(
+				'id1' => $options['image'],
+			);
+			$body['big_picture'] = $options['image'];
+		}
 
 		if ( isset( $options['url'] ) ) {
 			$body['url'] = $options['url'];
@@ -123,10 +135,10 @@ class API {
 			'subtitle'                  => array(
 				'en' => stripslashes( $subtitle ),
 			),
-			'ios_attachments'           => array(
+			'ios_attachments'           => ! empty( $options['image'] ) ? array(
 				'id1' => $options['image'],
-			),
-			'big_picture'               => $options['image'],
+			) : array(),
+			'big_picture'               => $options['image'] ?? '',
 		);
 
 		if ( isset( $options['url'] ) ) {
