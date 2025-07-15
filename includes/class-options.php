@@ -132,26 +132,19 @@ class Options implements RegistrationInterface {
 			)
 		);
 
-		$cmb_options->add_field(
-			array(
-				'name' => esc_html__( 'Testing', 'apppresser-onesignal' ),
-				'desc' => esc_html__( 'Send notifications to testing segment. ', 'apppresser-onesignal' ),
-				'id'   => 'onesignal_testing',
-				'type' => 'checkbox',
-			)
-		);
-
-		/*
-		* OneSignal Segment
-		*/
-		$cmb_options->add_field(
-			array(
-				'name' => esc_html__( 'Segment', 'apppresser-onesignal' ),
-				'desc' => esc_html__( 'Segment to send notifications to. Other segments will be ignored.', 'apppresser-onesignal' ),
-				'id'   => 'onesignal_segment',
-				'type' => 'text',
-			)
-		);
+		        /*
+        * OneSignal Segments
+        */
+        $cmb_options->add_field(
+            array(
+                'name'    => esc_html__( 'Default Segments', 'apppresser-onesignal' ),
+                'desc'    => esc_html__( 'Select the default segments to send notifications to. This can be overridden on a per-post basis.', 'apppresser-onesignal' ),
+                'id'      => 'onesignal_segments',
+                'type'    => 'multicheck',
+                'options' => $this->get_segments_options(),
+                'default' => array( 'All' ),
+            )
+        );
 
 		$cmb_options->add_field(
 			array(
@@ -209,6 +202,31 @@ class Options implements RegistrationInterface {
 		return $options;
 	}
 
+    /**
+     * Get OneSignal segments and format for cmb options.
+     */
+    public function get_segments_options() {
+        $options = get_option( self::OPTION_NAME );
+
+        if ( empty( $options['onesignal_app_id'] ) || empty( $options['onesignal_rest_api_key'] ) ) {
+            return array( 'all' => 'All Subscribers' );
+        }
+
+        $api      = new API( $options['onesignal_app_id'], $options['onesignal_rest_api_key'] );
+        $segments = $api->get_segments();
+
+        if ( empty( $segments ) ) {
+            return array( 'all' => 'All Subscribers' );
+        }
+
+        $segment_options = array( 'All' => 'All Subscribers' );
+        foreach ( $segments as $segment ) {
+            $segment_options[ $segment['name'] ] = $segment['name'];
+        }
+
+        return $segment_options;
+    }
+
 	/**
 	 * Enqueue admin scripts and styles.
 	 */
@@ -242,8 +260,9 @@ class Options implements RegistrationInterface {
 			wp_send_json_error( 'OneSignal is not properly configured' );
 		}
 
-		$api_class = new API( $options['onesignal_app_id'], $options['onesignal_rest_api_key'] );
-		$response  = $api_class->send_message( $message, '', '', array( 'image' => '' ) );
+		        $api_class = new API( $options['onesignal_app_id'], $options['onesignal_rest_api_key'] );
+        $segments  = isset( $options['onesignal_segments'] ) ? (array) $options['onesignal_segments'] : array( 'All' );
+        $response  = $api_class->send_message( $message, '', '', $segments, array( 'image' => '' ) );
 
 		if ( $response ) {
 			wp_send_json_success( 'Message successfully sent!' );

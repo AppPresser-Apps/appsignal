@@ -104,6 +104,15 @@ class PostMetabox {
 		$send_notification = get_post_meta( $post->ID, 'appsignal_send_notification', true );
 		$title = get_post_meta( $post->ID, 'appsignal_notification_title', true );
 		$message = get_post_meta( $post->ID, 'appsignal_notification_message', true );
+		$segments = get_post_meta( $post->ID, 'appsignal_notification_segments', true );
+
+		$options_class = new Options();
+		$all_segments = $options_class->get_segments_options();
+
+		if ( empty( $segments ) ) {
+			$plugin_options = appsig_get_option('all');
+			$segments = isset( $plugin_options['onesignal_segments'] ) ? (array) $plugin_options['onesignal_segments'] : array( 'All' );
+		}
 		?>
 		<div class="misc-pub-section">
 			<div class="">
@@ -138,6 +147,16 @@ class PostMetabox {
 						<label for="appsignal-notification-message" class="components-checkbox-control__label">Message</label>
 						<textarea id="appsignal-notification-message" name="appsignal_notification_message" maxlength="60"><?php echo esc_textarea( $message ); ?></textarea>
 						<p class="components-checkbox-control__help">Max input 60 characters</p>
+					</div>
+
+					<div class="components-base-control__field">
+						<label for="appsignal-notification-segments" class="components-checkbox-control__label">Segments</label>
+						<select id="appsignal-notification-segments" name="appsignal_notification_segments[]" multiple>
+							<?php foreach ( $all_segments as $segment_key => $segment_name ) : ?>
+								<option value="<?php echo esc_attr( $segment_key ); ?>" <?php selected( in_array( $segment_key, (array) $segments, true ) ); ?>><?php echo esc_html( $segment_name ); ?></option>
+							<?php endforeach; ?>
+						</select>
+						<p class="components-checkbox-control__help">Select the segments to send the notification to.</p>
 					</div>
 				</div>
 
@@ -277,6 +296,7 @@ class PostMetabox {
 		$send_notification = isset( $_POST['appsignal_send_notification'] ) && '1' === $_POST['appsignal_send_notification'];
 		$title = isset( $_POST['appsignal_notification_title'] ) ? sanitize_text_field( $_POST['appsignal_notification_title'] ) : '';
 		$message = isset( $_POST['appsignal_notification_message'] ) ? sanitize_textarea_field( $_POST['appsignal_notification_message'] ) : '';
+		$segments = isset( $_POST['appsignal_notification_segments'] ) ? array_map( 'sanitize_text_field', (array) $_POST['appsignal_notification_segments'] ) : array();
 
 		// Update the meta field to reflect the checkbox state.
 		if ( $send_notification ) {
@@ -287,6 +307,7 @@ class PostMetabox {
 
 		update_post_meta( $post_id, 'appsignal_notification_title', $title );
 		update_post_meta( $post_id, 'appsignal_notification_message', $message );
+		update_post_meta( $post_id, 'appsignal_notification_segments', $segments );
 
 		// Only send notification if the box was checked for this update and the post is published.
 		if ( $send_notification && 'publish' === get_post_status( $post_id ) ) {
@@ -300,8 +321,6 @@ class PostMetabox {
 	 * @param int $post_id The ID of the post to send a notification for.
 	 */
 	public function send_push_notification( $post_id ) {
-
-
 		if ( ! get_post_meta( $post_id, 'appsignal_send_notification', true ) ) {
 			return;
 		}
@@ -318,13 +337,19 @@ class PostMetabox {
 		$header  = $custom_title;
 		$message = $custom_message;
 		$url     = get_permalink( $post_id );
+		$segments = get_post_meta( $post_id, 'appsignal_notification_segments', true );
+		if ( empty( $segments ) ) {
+			$plugin_options = appsig_get_option('all');
+			$segments = isset( $plugin_options['onesignal_segments'] ) ? (array) $plugin_options['onesignal_segments'] : array( 'All' );
+		}
 
 		// Send the notification using the helper function
 		appsig_send_message_all(
 			$message,
 			$header,
 			'',
-			[ 'data' => array( 'post_id' => $post_id ) ]	
+			$segments,
+			[ 'data' => array( 'post_id' => $post_id ) ]
 		);
 
 		// Remove the meta value to prevent sending the notification again.

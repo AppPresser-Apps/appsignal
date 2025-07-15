@@ -9,7 +9,7 @@
  * Plugin Name: AppSignal
  * Plugin URI: https://apppresser.com
  * Description: AppPresser OneSignal Push Notifications
- * Version: 1.0.7
+ * Version: 1.0.8
  * Author: AppPresser
  * Author URI: https://apppresser.com
  * License: GPL2
