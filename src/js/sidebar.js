@@ -1,7 +1,7 @@
 import { __ } from '@wordpress/i18n';
 import { registerPlugin } from '@wordpress/plugins';
 import { PluginDocumentSettingPanel } from '@wordpress/editor';
-import { ToggleControl, PanelRow, Button, TextControl, TextareaControl, CheckboxControl } from '@wordpress/components';
+import { ToggleControl, PanelRow, Button, TextControl, TextareaControl } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { useState, useEffect, useRef } from '@wordpress/element';
@@ -18,7 +18,6 @@ const AppsignalDocumentSettingPanel = ( { meta, setMeta } ) => {
     const [titleError, setTitleError] = useState(null);
     const [messageError, setMessageError] = useState(null);
     const [localToggleValue, setLocalToggleValue] = useState(null);
-    const { all_segments, default_segments } = window.appsignalOneSignalData;
 
     const { createNotice } = useDispatch('core/notices');
     const { savePost } = useDispatch( 'core/editor' );
@@ -35,13 +34,6 @@ const AppsignalDocumentSettingPanel = ( { meta, setMeta } ) => {
             }
             prevStatus.current = postStatus;
         }, [postStatus]);
-
-        useEffect(() => {
-            // Initialize segments if not set.
-            if (meta && typeof meta.appsignal_notification_segments === 'undefined') {
-                setMeta({ ...meta, appsignal_notification_segments: default_segments });
-            }
-        }, [meta]);
 
     if ( ! meta ) {
         return null;
@@ -156,22 +148,6 @@ const AppsignalDocumentSettingPanel = ( { meta, setMeta } ) => {
                 help={`${(meta.appsignal_notification_message || '').length}/60`}
             />
             { messageError && <div style={ { color: '#d63638', marginTop: '-10px', fontSize: '12px', marginBottom: '10px' } }>{ messageError }</div> }
-
-            <h2 style={{ fontSize: '14px', marginTop: '20px', marginBottom: '8px' }}>{ __( 'Segments', 'apppresser-onesignal' ) }</h2>
-            { all_segments && Object.entries( all_segments ).map( ( [ key, name ] ) => (
-                <CheckboxControl
-                    key={ key }
-                    label={ name }
-                    checked={ ( meta.appsignal_notification_segments || [] ).includes( key ) }
-                    onChange={ ( isChecked ) => {
-                        const currentSegments = meta.appsignal_notification_segments || [];
-                        const newSegments = isChecked
-                            ? [ ...currentSegments, key ]
-                            : currentSegments.filter( ( segment ) => segment !== key );
-                        setMeta( { ...meta, appsignal_notification_segments: newSegments } );
-                    } }
-                />
-            ) ) }
 
             <PanelRow>
                 <div style={{ width: '100%' }}>

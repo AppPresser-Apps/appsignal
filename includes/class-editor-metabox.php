@@ -78,12 +78,6 @@ class Editor_Metabox {
         wp_set_script_translations( 'appsignal-editor', 'apppresser-onesignal' );
 
         // Localize script with necessary data
-        $options_class = new Options();
-        $all_segments = $options_class->get_segments_options();
-        $plugin_options = appsig_get_option('all');
-        $default_segments = isset( $plugin_options['onesignal_segments'] ) ? (array) $plugin_options['onesignal_segments'] : array( 'All' );
-
-        // Localize script with necessary data
         wp_localize_script(
             'appsignal-editor',
             'appsignalOneSignalData',
@@ -91,8 +85,6 @@ class Editor_Metabox {
                 'rest_url' => rest_url(),
                 'nonce' => wp_create_nonce('wp_rest'),
                 'post_id' => get_the_ID(),
-                'all_segments' => $all_segments,
-                'default_segments' => $default_segments,
             ]
         );
     }
@@ -135,24 +127,7 @@ class Editor_Metabox {
                         'single'            => true,
                         'sanitize_callback' => 'sanitize_text_field',
                 ]
-            );
-
-            register_post_meta(
-                $post_type,
-                'appsignal_notification_segments',
-                [
-                    'show_in_rest' => [
-                        'schema' => [
-                            'type'  => 'array',
-                            'items' => [
-                                'type' => 'string',
-                            ],
-                        ],
-                    ],
-                    'type'         => 'array',
-                    'single'       => true,
-                ]
-            );
+        );
         }
     }
 }
@@ -217,18 +192,11 @@ class AppSignal_Send_Push_API {
         $message = $custom_message;
         $url     = get_permalink( $post );
 
-        $segments = get_post_meta( $post_id, 'appsignal_notification_segments', true );
-        if ( empty( $segments ) ) {
-            $plugin_options = appsig_get_option('all');
-            $segments = isset( $plugin_options['onesignal_segments'] ) ? (array) $plugin_options['onesignal_segments'] : array( 'All' );
-        }
-
         // Send the notification using the helper function
         $result = appsig_send_message_all(
             $message,
             $header,
             '',
-            $segments,
             [ 'data' => array( 'post_id' => $post_id ) ]
         );
   
