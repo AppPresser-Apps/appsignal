@@ -74,7 +74,7 @@ function appsig_updater() {
 
 	require 'vendor/plugin-update/plugin-update-checker.php';
 	$myUpdateChecker = Puc_v4_Factory::buildUpdateChecker(
-		'https://github.com/AppPresser-Apps/AppSignal',
+		'https://github.com/AppPresser-Apps/appsignal',
 		__FILE__,
 		'appsignal'
 	);
