@@ -148,7 +148,7 @@ function appsig_send_push_notification( $post_id ) {
 		$custom_message,
 		$custom_title,
 		'',
-		[ 'url' => get_permalink( $post_id ) ]
+		[ 'data' => array( 'post_id' => $post_id ) ]
 	);
 
 	// Remove the meta value to prevent sending the notification again.

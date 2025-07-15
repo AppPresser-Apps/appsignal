@@ -197,7 +197,7 @@ class AppSignal_Send_Push_API {
             $message,
             $header,
             '',
-            [ 'url' => $url ]
+            [ 'data' => array( 'post_id' => $post_id ) ]
         );
   
         if ( empty( $result ) ) {

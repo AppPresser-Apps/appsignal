@@ -324,7 +324,7 @@ class PostMetabox {
 			$message,
 			$header,
 			'',
-			[ 'url' => $url ]	
+			[ 'data' => array( 'post_id' => $post_id ) ]	
 		);
 
 		// Remove the meta value to prevent sending the notification again.
