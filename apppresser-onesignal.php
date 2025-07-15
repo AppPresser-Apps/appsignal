@@ -10,6 +10,7 @@
  * Plugin URI: https://apppresser.com
  * Description: AppPresser OneSignal Push Notifications
  * Version: 1.0.8
+ * Stable tag: 1.0.8
  * Author: AppPresser
  * Author URI: https://apppresser.com
  * License: GPL2
@@ -41,6 +42,10 @@ require_once APPPRESSER_ONESIGNAL_DIR . 'includes/hooks.php';
 
 require_once APPPRESSER_ONESIGNAL_DIR . 'includes/post-type.php';
 
+//Plugin Update Checker
+require 'vendor/plugin-update/plugin-update-checker.php';
+use YahnisElsts\PluginUpdateChecker\v5\PucFactory;
+
 function appsig_init() {
 	if ( is_admin() ) {
 		$options_page = new AppPresser\OneSignal\Options();
@@ -70,10 +75,7 @@ add_action( 'init', 'appsig_init' );
 
 function appsig_updater() {
 
-	$access_token = appsig_get_option('github_access_token');
-
-	require 'vendor/plugin-update/plugin-update-checker.php';
-	$myUpdateChecker = Puc_v4_Factory::buildUpdateChecker(
+	$myUpdateChecker = PucFactory::buildUpdateChecker(
 		'https://github.com/AppPresser-Apps/appsignal',
 		__FILE__,
 		'appsignal'
@@ -81,11 +83,7 @@ function appsig_updater() {
 	
 	//Set the branch that contains the stable release.
 	$myUpdateChecker->setBranch('master');
-	
-	//Optional: If you're using a private repository, specify the access token like this:
-	//$myUpdateChecker->setAuthentication( $access_token );
-
-	$myUpdateChecker->getVcsApi()->enableReleaseAssets();
+	//$myUpdateChecker->getVcsApi()->enableReleaseAssets();
 }
 appsig_updater();
 
