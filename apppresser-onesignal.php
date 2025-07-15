@@ -9,8 +9,8 @@
  * Plugin Name: AppSignal
  * Plugin URI: https://apppresser.com
  * Description: AppPresser OneSignal Push Notifications
- * Version: 1.0.8
- * Stable tag: 1.0.8
+ * Version: 1.0.9
+ * Stable tag: 1.0.9
  * Author: AppPresser
  * Author URI: https://apppresser.com
  * License: GPL2
@@ -46,6 +46,16 @@ require_once APPPRESSER_ONESIGNAL_DIR . 'includes/post-type.php';
 require 'vendor/plugin-update/plugin-update-checker.php';
 use YahnisElsts\PluginUpdateChecker\v5\PucFactory;
 
+$myUpdateChecker = PucFactory::buildUpdateChecker(
+	'https://github.com/AppPresser-Apps/appsignal',
+	__FILE__,
+	'appsignal'
+);
+
+//Set the branch that contains the stable release.
+$myUpdateChecker->setBranch('master');
+$myUpdateChecker->getVcsApi()->enableReleaseAssets();
+
 function appsig_init() {
 	if ( is_admin() ) {
 		$options_page = new AppPresser\OneSignal\Options();
@@ -72,20 +82,6 @@ function appsig_init() {
 }
 add_action( 'init', 'appsig_init' );
 
-
-function appsig_updater() {
-
-	$myUpdateChecker = PucFactory::buildUpdateChecker(
-		'https://github.com/AppPresser-Apps/appsignal',
-		__FILE__,
-		'appsignal'
-	);
-	
-	//Set the branch that contains the stable release.
-	$myUpdateChecker->setBranch('master');
-	//$myUpdateChecker->getVcsApi()->enableReleaseAssets();
-}
-appsig_updater();
 
 /**
  * Wrapper function around cmb2_get_option
