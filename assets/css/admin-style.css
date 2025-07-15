@@ -1,0 +1,9 @@
+.components-base-control__field {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 1em;
+}
+
+.components-base-control__field .components-text-control__input {
+    width: 100%;
+}
