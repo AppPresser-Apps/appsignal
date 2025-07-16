@@ -142,15 +142,17 @@ class Options implements RegistrationInterface {
 		);
 
 		/*
-		* OneSignal Segment
+		* OneSignal Segments
 		*/
 		$cmb_options->add_field(
-			array(
-				'name' => esc_html__( 'Segment', 'apppresser-onesignal' ),
-				'desc' => esc_html__( 'Segment to send notifications to. Other segments will be ignored.', 'apppresser-onesignal' ),
-				'id'   => 'onesignal_segment',
-				'type' => 'text',
-			)
+				array(
+						'name'    => esc_html__( 'Default Segments', 'apppresser-onesignal' ),
+						'desc'    => esc_html__( 'Select the default segments to send notifications to. This can be overridden on a per-post basis.', 'apppresser-onesignal' ),
+						'id'      => 'onesignal_segments',
+						'type'    => 'multicheck',
+						'options' => $this->get_segments_options(),
+						'default' => array( 'All' ),
+				)
 		);
 
 		$cmb_options->add_field(
@@ -207,6 +209,31 @@ class Options implements RegistrationInterface {
 		}
 
 		return $options;
+	}
+
+	    /**
+     * Get OneSignal segments and format for cmb options.
+     */
+    public function get_segments_options() {
+			$options = get_option( self::OPTION_NAME );
+
+			if ( empty( $options['onesignal_app_id'] ) || empty( $options['onesignal_rest_api_key'] ) ) {
+					return array( 'all' => 'All Subscribers' );
+			}
+
+			$api      = new API( $options['onesignal_app_id'], $options['onesignal_rest_api_key'] );
+			$segments = $api->get_segments();
+
+			if ( empty( $segments ) ) {
+					return array( 'all' => 'All Subscribers' );
+			}
+
+			$segment_options = array( 'All' => 'All Subscribers' );
+			foreach ( $segments as $segment ) {
+					$segment_options[ $segment['name'] ] = $segment['name'];
+			}
+
+			return $segment_options;
 	}
 
 	/**

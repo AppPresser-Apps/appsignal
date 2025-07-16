@@ -44,6 +44,41 @@ class API {
 	}
 
 	/**
+	 * Gets segments from the OneSignal API.
+	 *
+	 * @return mixed API Response;
+	 */
+	public function get_segments() {
+		$url = 'https://onesignal.com/api/v1/apps/' . $this->app_id . '/segments';
+
+		$args = array(
+			'timeout'     => 60,
+			'redirection' => 5,
+			'blocking'    => true,
+			'httpversion' => '1.0',
+			'sslverify'   => false,
+			'headers'     => array(
+				'Authorization' => 'Basic ' . $this->rest_api_key,
+			),
+		);
+
+		$response = wp_remote_get( $url, $args );
+
+		if ( is_wp_error( $response ) ) {
+			return array();
+		}
+
+		$body = wp_remote_retrieve_body( $response );
+		$data = json_decode( $body, true );
+
+		if ( isset( $data['segments'] ) ) {
+			return $data['segments'];
+		}
+
+		return array();
+	}
+
+	/**
 	 * Sends a push notificiation using the OneSignal API.
 	 *
 	 * @param string $message The message to send.
@@ -56,16 +91,14 @@ class API {
 		$appsig_options = appsig_get_option('all');
 
 		if ( isset( $appsig_options['onesignal_testing'] ) ) {
-			$segment = $appsig_options['onesignal_segment'];
+			$segments = $appsig_options['onesignal_segments'];
 		} else {
-			$segment = 'all' ;
+			$segments = array('all');
 		}
 
 		$body = array(
 			'app_id'             => $this->app_id,
-			'included_segments'  => array(
-				$segment,
-			),
+			'included_segments'  => $segments,
 			'contents'          => array(
 				'en' => stripslashes( $message ),
 			),
