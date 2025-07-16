@@ -146,8 +146,8 @@ class Options implements RegistrationInterface {
 		*/
 		$cmb_options->add_field(
 				array(
-						'name'    => esc_html__( 'Default Segments', 'apppresser-onesignal' ),
-						'desc'    => esc_html__( 'Select the default segments to send notifications to. This can be overridden on a per-post basis.', 'apppresser-onesignal' ),
+						'name'    => esc_html__( 'Segments', 'apppresser-onesignal' ),
+						'desc'    => esc_html__( 'Select the segments to send notifications to.', 'apppresser-onesignal' ),
 						'id'      => 'onesignal_segments',
 						'type'    => 'multicheck',
 						'options' => $this->get_segments_options(),
@@ -158,7 +158,7 @@ class Options implements RegistrationInterface {
 		$cmb_options->add_field(
 			array(
 				'name'       => esc_html__( 'Test Message', 'apppresser-onesignal' ),
-				'desc'       => esc_html__( 'Send a test message to all subscribers.', 'apppresser-onesignal' ),
+				'desc'       => esc_html__( 'Send a test message to selected segments.', 'apppresser-onesignal' ),
 				'id'         => 'onesignal_message',
 				'type'       => 'text',
 				'save_field' => false, // Don't save this field to options
