@@ -140,8 +140,21 @@ class API {
 			'body'        => stripslashes( wp_json_encode( $body, JSON_UNESCAPED_SLASHES ) ),
 		);
 
+		error_log( 'OneSignal API: Sending request to ' . self::ONESIGNAL_ENDPOINT_URL );
+		error_log( 'OneSignal API: Request body: ' . stripslashes( wp_json_encode( $body, JSON_UNESCAPED_SLASHES ) ) );
+
 		$response = wp_remote_post( self::ONESIGNAL_ENDPOINT_URL, $args );
-		$code     = $response['response']['code'] ?? 404;
+
+		if ( is_wp_error( $response ) ) {
+			error_log( 'OneSignal API: WP Error: ' . $response->get_error_message() );
+			return false;
+		}
+
+		$code = $response['response']['code'] ?? 404;
+		$response_body = wp_remote_retrieve_body( $response );
+
+		error_log( 'OneSignal API: Response code: ' . $code );
+		error_log( 'OneSignal API: Response body: ' . $response_body );
 
 		return 200 === $code;
 	}
@@ -149,7 +162,6 @@ class API {
 	/**
 	 * Sends a push notificiation to a specific device or devices using the OneSignal API.
 	 *
-	 * @param string $message The message to send.
 	 * @param string $header Message header.
 	 * @param string $subtitle Message subtitle.
 	 * @param array  $options Options for sending the message.

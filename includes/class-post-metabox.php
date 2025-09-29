@@ -10,26 +10,16 @@ class PostMetabox {
 	/**
 	 * The options instance.
 	 *
-	 * @var Options
+	 * @var array
 	 */
 	private $options;
 
 	/**
 	 * Constructor.
-	 *
-	 * @param Options $options The options instance.
 	 */
-	public function __construct( Options $options ) {
-		$this->options = $options;
-	}
-
-	/**
-	 * Determines if the object should be registered.
-	 *
-	 * @return bool True if the object should be registered, false otherwise.
-	 */
-	public function can_register() {
-		return is_admin();
+	public function __construct() {
+		$this->options = appsig_get_option( 'all' );
+		add_action( 'admin_init', array( $this, 'init' ) );
 	}
 
 	/**
@@ -37,7 +27,7 @@ class PostMetabox {
 	 *
 	 * @return void
 	 */
-	public function register() {
+	public function init() {
 		add_action( 'add_meta_boxes', array( $this, 'add_meta_boxes' ) );
 		add_action( 'save_post', array( $this, 'save_post_notification' ) );
 	}
@@ -332,3 +322,5 @@ class PostMetabox {
 
 	}
 }
+
+new PostMetabox();

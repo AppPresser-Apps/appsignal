@@ -1,0 +1,224 @@
+* {
+	box-sizing: inherit;
+}
+
+.flex-right {
+	display: flex; 
+	justify-content: flex-end;
+}
+
+.appsignal-notice {
+	z-index: 999999;
+	position: fixed;
+	bottom: 60px;
+	left: 190px;
+	max-width: 400px;
+	border-radius: 4px;
+	overflow: hidden;
+	box-shadow: rgba(99, 99, 99, 0.1) 0px 2px 6px 0px;
+}
+
+/* Adjust notice position based on WordPress admin menu state */
+.folded .appsignal-notice {
+	left: 60px;
+}
+
+@media screen and (max-width: 960px) {
+	.appsignal-notice {
+		left: 60px;
+	}
+}
+
+.settings_page_appsignal {
+	background: #f6f6f6;
+	font-size: 14px;
+	position: relative;
+	box-sizing: border-box;
+	font-family: Helvetica Neue,Helvetica,Arial,Lucida Grande,sans-serif;
+}
+
+#wpcontent,
+.auto-fold #wpcontent {
+	padding-left: 0;
+}
+
+#appsignal .save-button.components-button.is-primary,
+#appsignal .save-button.components-button.is-primary:hover,
+#appsignal .save-button.components-button.is-primary:focus {
+	color: #ffffff !important;
+}
+
+#appsignal .save-button.components-button.is-primary:hover {
+	background-color: var(--wp-admin-theme-color-darker-10, #135e96) !important;
+}
+
+#appsignal .appsignal-spinner-center,
+#appsignal .appsignal-spinner-center .components-placeholder,
+#appsignal .appsignal-spinner-center .d-flex {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+#appsignal .appsignal-spinner-center {
+	min-height: 50vh;
+	width: 100%;
+}
+
+#appsignal .appsignal-spinner-center .components-placeholder {
+	background: transparent;
+	border: none;
+	box-shadow: none;
+}
+
+#appsignal .appsignal-spinner-center .components-placeholder__fieldset,
+#appsignal .appsignal-spinner-center .components-placeholder__fieldset form,
+#appsignal .appsignal-spinner-center .justify-content-center {
+	justify-content: center !important;
+	align-items: center;
+}
+
+#appsignal .components-placeholder {
+	background: #f6f6f6;
+	margin-top: 25vh;
+	margin-bottom: 25vh;
+}
+
+#appsignal .appsignal-header {
+	padding: 20px 10px;
+	background-color: #ffffff;
+	box-shadow: 0 1px 0 rgba(213,213,213,0.5),0 1px 2px #eee;
+}
+
+#appsignal .appsignal-header .appsignal-container,
+#appsignal .appsignal-main {
+	margin: 0 auto;
+	max-width: 750px;
+}
+
+#appsignal .appsignal-header .appsignal-container .codeinwp-logo {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+#appsignal .appsignal-main {
+	padding: 0 20px;
+}
+
+/* Override hover color for all components-button elements except save-button */
+#appsignal .appsignal-main .components-button:hover:not(:disabled,[aria-disabled=true]):not(.save-button),
+#appsignal .appsignal-main .components-panel__body .components-panel__body-title .components-button:hover:not(:disabled,[aria-disabled=true]),
+#appsignal .appsignal-main .components-panel__body .components-panel__body-title .components-button[aria-expanded=true] {
+	color: #000000 !important;
+	--wp-admin-theme-color: #000000 !important;
+}
+
+#appsignal .appsignal-main .components-panel__body {
+	margin: 25px 0;
+	background: #fff;
+	border: 1px solid #e2e4e7;
+}
+
+#appsignal .appsignal-main .components-panel__body .components-panel__body-toggle {
+	border-bottom: 1px solid #d6e2ed;
+}
+
+#appsignal .appsignal-main .components-panel__body .components-panel__body-toggle:focus {
+	box-shadow: none;
+}
+
+
+#appsignal .appsignal-main .components-panel__body .components-panel__body-title:hover {
+	background: #ffffff;
+}
+
+#appsignal .appsignal-main .components-panel__body .components-panel__row {
+	padding: 10px;
+	margin: 0;
+}
+
+
+#appsignal .appsignal-main .components-panel__body .components-panel__row .components-base-control .appsignal-checkbox-group {
+	margin: 10px;
+}
+
+#appsignal .appsignal-main .components-panel__body .components-panel__row .components-base-control .components-base-control__field {
+	align-items: center;
+	margin-bottom: 10px;
+}
+
+#appsignal .appsignal-main .components-panel__body .components-panel__row .components-base-control .components-base-control__field .components-base-control__label,
+#appsignal .appsignal-main .components-panel__body .components-panel__row .components-base-control.appsignal-text-field label {
+	font-weight: 600;
+	margin-bottom: 10px;
+}
+
+#appsignal .appsignal-main .components-panel__body .components-panel__row .components-base-control,
+#appsignal .appsignal-main .components-panel__body .components-panel__row .components-base-control.appsignal-text-field {
+	width: 100%;
+}
+
+#appsignal .appsignal-main .components-panel__body .components-panel__row .components-base-control.appsignal-text-field input {
+	border: 1px solid #b7c9d9;
+	border-radius: 3px;
+	font-size: 14px;
+	padding: 9px 15px;
+	width: 100%;
+	box-shadow: none;
+	height: 40px;
+	margin: 0 0 10px 0;
+	color: #444;
+}
+
+#appsignal .appsignal-main .components-panel__body .components-panel__row .components-base-control.appsignal-text-field input:disabled {
+	background: #f6f6f6;
+	border-color: #eeeeee;
+	color: #bbbbbb;
+}
+
+#appsignal .appsignal-main .components-panel__body .components-panel__row .components-base-control.appsignal-text-field input:focus {
+	border-color: #00a0d2;
+	box-shadow: 0 0 0 1px #00a0d2;
+	outline: 2px solid transparent;
+	outline-offset: -2px;
+}
+
+#appsignal .appsignal-main .components-panel__body .components-panel__row .components-base-control.appsignal-text-field .appsignal-text-field-button-group {
+	display: flex;
+	align-items: center;
+	margin: 2px 0 15px;
+	justify-content: flex-end;
+}
+
+#appsignal .appsignal-main .components-panel__body .components-panel__row .components-base-control.appsignal-text-field .appsignal-text-field-button-group .is-primary,
+#appsignal .appsignal-main .appsignal-info .appsignal-info-button-group .is-default {
+	padding: 2px 20px;
+	height: auto;
+	font-size: 14px;
+}
+
+#appsignal .appsignal-main .components-panel__body .components-panel__row .components-base-control.appsignal-text-field .appsignal-text-field-button-group .is-primary {
+	margin-right: 10px;
+}
+
+#appsignal .appsignal-main .appsignal-info {
+	padding: 0 10px 10px;
+}
+
+#appsignal .appsignal-main .appsignal-info h2 {
+	font-weight: 300;
+	margin-bottom: 10px;
+}
+
+#appsignal .appsignal-main .appsignal-info p {
+	margin: 0 0 1.5em 0;
+}
+
+#appsignal .appsignal-main .appsignal-info .appsignal-info-button-group {
+	display: flex;
+}
+
+#appsignal .appsignal-main .appsignal-info .appsignal-info-button-group .is-default:first-child {
+	margin-right: 15px;
+}

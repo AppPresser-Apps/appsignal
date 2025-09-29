@@ -2,295 +2,25 @@
 /******/ 	"use strict";
 /******/ 	var __webpack_modules__ = ({
 
-/***/ "./src/js/sidebar.js":
-/*!***************************!*\
-  !*** ./src/js/sidebar.js ***!
-  \***************************/
+/***/ "./assets/appp-logo.png":
+/*!******************************!*\
+  !*** ./assets/appp-logo.png ***!
+  \******************************/
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+module.exports = __webpack_require__.p + "images/appp-logo.4efe5030.png";
+
+/***/ }),
+
+/***/ "./src/css/settings.css":
+/*!******************************!*\
+  !*** ./src/css/settings.css ***!
+  \******************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "react");
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @wordpress/i18n */ "@wordpress/i18n");
-/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _wordpress_plugins__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @wordpress/plugins */ "@wordpress/plugins");
-/* harmony import */ var _wordpress_plugins__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_wordpress_plugins__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var _wordpress_editor__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @wordpress/editor */ "@wordpress/editor");
-/* harmony import */ var _wordpress_editor__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_wordpress_editor__WEBPACK_IMPORTED_MODULE_3__);
-/* harmony import */ var _wordpress_components__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @wordpress/components */ "@wordpress/components");
-/* harmony import */ var _wordpress_components__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_wordpress_components__WEBPACK_IMPORTED_MODULE_4__);
-/* harmony import */ var _wordpress_data__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @wordpress/data */ "@wordpress/data");
-/* harmony import */ var _wordpress_data__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(_wordpress_data__WEBPACK_IMPORTED_MODULE_5__);
-/* harmony import */ var _wordpress_compose__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @wordpress/compose */ "@wordpress/compose");
-/* harmony import */ var _wordpress_compose__WEBPACK_IMPORTED_MODULE_6___default = /*#__PURE__*/__webpack_require__.n(_wordpress_compose__WEBPACK_IMPORTED_MODULE_6__);
-/* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @wordpress/element */ "@wordpress/element");
-/* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_7___default = /*#__PURE__*/__webpack_require__.n(_wordpress_element__WEBPACK_IMPORTED_MODULE_7__);
+// extracted by mini-css-extract-plugin
 
-
-
-
-
-
-
-
-
-const AppsignalDocumentSettingPanel = ({
-  meta,
-  setMeta
-}) => {
-  const postStatus = (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_5__.useSelect)(select => {
-    return select('core/editor').getCurrentPost().status;
-  }, []);
-  const [isSending, setIsSending] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_7__.useState)(false);
-  const [sendStatus, setSendStatus] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_7__.useState)(null);
-  const [titleError, setTitleError] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_7__.useState)(null);
-  const [messageError, setMessageError] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_7__.useState)(null);
-  const [localToggleValue, setLocalToggleValue] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_7__.useState)(null);
-  const {
-    createNotice
-  } = (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_5__.useDispatch)('core/notices');
-  const {
-    savePost
-  } = (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_5__.useDispatch)('core/editor');
-
-  // Track previous status to detect transition to 'publish'
-  const prevStatus = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_7__.useRef)(postStatus);
-  (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_7__.useEffect)(() => {
-    if (prevStatus.current !== 'publish' && postStatus === 'publish') {
-      // Post has just been published!
-      // Place your logic here (e.g., show a notice, call an API, etc.)
-      console.log('Post was published!');
-      sendNotification();
-    }
-    prevStatus.current = postStatus;
-  }, [postStatus]);
-  if (!meta) {
-    return null;
-  }
-
-  /**
-   * Send push notification via API
-   */
-  const sendNotification = async () => {
-    const title = meta.appsignal_notification_title || '';
-    const message = meta.appsignal_notification_message || '';
-    let hasError = false;
-    if (!title.trim()) {
-      setTitleError((0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Title is required.', 'apppresser-onesignal'));
-      hasError = true;
-    } else {
-      setTitleError(null);
-    }
-    if (!message.trim()) {
-      setMessageError((0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Message is required.', 'apppresser-onesignal'));
-      hasError = true;
-    } else {
-      setMessageError(null);
-    }
-    if (hasError) {
-      return;
-    }
-    setIsSending(true);
-    setSendStatus(null);
-    try {
-      await savePost();
-      const response = await window.fetch(`${window.appsignalOneSignalData?.rest_url}appsignal/v1/send`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-WP-Nonce': window.appsignalOneSignalData?.nonce || ''
-        },
-        body: JSON.stringify({
-          post_id: window.appsignalOneSignalData?.post_id || 0
-        })
-      });
-      if (!response.ok) {
-        throw new Error('Failed to send notification');
-      }
-      setSendStatus('success');
-      createNotice('success', (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Push notification sent successfully!', 'apppresser-onesignal'), {
-        id: 'appsignal-notice',
-        isDismissible: true
-      });
-    } catch (error) {
-      console.error('Error sending push notification:', error);
-      setSendStatus('error');
-      createNotice('error', (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Failed to send push notification. Please try again.', 'apppresser-onesignal'), {
-        id: 'appsignal-notice',
-        isDismissible: true
-      });
-    } finally {
-      setIsSending(false);
-    }
-  };
-
-  /**
-  * Get help text based on post status
-  */
-  const getHelpText = () => {
-    return (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('A notification will be sent when this post is published.', 'apppresser-onesignal');
-  };
-  return (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_editor__WEBPACK_IMPORTED_MODULE_3__.PluginDocumentSettingPanel, {
-    name: "appsignal-document-setting-panel",
-    title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Push Notification', 'apppresser-onesignal')
-  }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_4__.ToggleControl, {
-    label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Send push notification', 'apppresser-onesignal'),
-    checked: meta.appsignal_send_notification,
-    onChange: value => {
-      setMeta({
-        ...meta,
-        appsignal_send_notification: value
-      });
-    },
-    disabled: !meta.appsignal_notification_title || !meta.appsignal_notification_message || postStatus === 'publish',
-    help: getHelpText()
-  }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_4__.TextControl, {
-    label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Title', 'apppresser-onesignal'),
-    value: meta.appsignal_notification_title || '',
-    onChange: value => {
-      setMeta({
-        ...meta,
-        appsignal_notification_title: value
-      });
-      if (value.trim()) {
-        setTitleError(null);
-      }
-    },
-    maxLength: 30,
-    help: `${(meta.appsignal_notification_title || '').length}/30`
-  }), titleError && (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
-    style: {
-      color: '#d63638',
-      marginTop: '-10px',
-      fontSize: '12px',
-      marginBottom: '10px'
-    }
-  }, titleError), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_4__.TextareaControl, {
-    label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Message', 'apppresser-onesignal'),
-    value: meta.appsignal_notification_message || '',
-    onChange: value => {
-      setMeta({
-        ...meta,
-        appsignal_notification_message: value
-      });
-      if (value.trim()) {
-        setMessageError(null);
-      }
-    },
-    maxLength: 60,
-    help: `${(meta.appsignal_notification_message || '').length}/60`
-  }), messageError && (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
-    style: {
-      color: '#d63638',
-      marginTop: '-10px',
-      fontSize: '12px',
-      marginBottom: '10px'
-    }
-  }, messageError), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_4__.PanelRow, null, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
-    style: {
-      width: '100%'
-    }
-  }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_4__.Button, {
-    variant: "secondary",
-    onClick: sendNotification,
-    isBusy: isSending,
-    disabled: isSending,
-    style: {
-      marginTop: '16px',
-      width: '100%',
-      textAlign: 'center',
-      display: 'flex',
-      justifyContent: 'center'
-    }
-  }, isSending ? (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Sending...', 'apppresser-onesignal') : (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Send Push', 'apppresser-onesignal')))));
-};
-const ComposedPanel = (0,_wordpress_compose__WEBPACK_IMPORTED_MODULE_6__.compose)([(0,_wordpress_data__WEBPACK_IMPORTED_MODULE_5__.withSelect)(select => {
-  const meta = select('core/editor').getEditedPostAttribute('meta');
-  return {
-    meta: meta
-  };
-}), (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_5__.withDispatch)(dispatch => {
-  return {
-    setMeta(newMeta) {
-      dispatch('core/editor').editPost({
-        meta: newMeta
-      });
-    }
-  };
-})])(AppsignalDocumentSettingPanel);
-(0,_wordpress_plugins__WEBPACK_IMPORTED_MODULE_2__.registerPlugin)('appsignal-document-setting-panel', {
-  render: ComposedPanel
-});
-
-/***/ }),
-
-/***/ "@wordpress/components":
-/*!************************************!*\
-  !*** external ["wp","components"] ***!
-  \************************************/
-/***/ ((module) => {
-
-module.exports = window["wp"]["components"];
-
-/***/ }),
-
-/***/ "@wordpress/compose":
-/*!*********************************!*\
-  !*** external ["wp","compose"] ***!
-  \*********************************/
-/***/ ((module) => {
-
-module.exports = window["wp"]["compose"];
-
-/***/ }),
-
-/***/ "@wordpress/data":
-/*!******************************!*\
-  !*** external ["wp","data"] ***!
-  \******************************/
-/***/ ((module) => {
-
-module.exports = window["wp"]["data"];
-
-/***/ }),
-
-/***/ "@wordpress/editor":
-/*!********************************!*\
-  !*** external ["wp","editor"] ***!
-  \********************************/
-/***/ ((module) => {
-
-module.exports = window["wp"]["editor"];
-
-/***/ }),
-
-/***/ "@wordpress/element":
-/*!*********************************!*\
-  !*** external ["wp","element"] ***!
-  \*********************************/
-/***/ ((module) => {
-
-module.exports = window["wp"]["element"];
-
-/***/ }),
-
-/***/ "@wordpress/i18n":
-/*!******************************!*\
-  !*** external ["wp","i18n"] ***!
-  \******************************/
-/***/ ((module) => {
-
-module.exports = window["wp"]["i18n"];
-
-/***/ }),
-
-/***/ "@wordpress/plugins":
-/*!*********************************!*\
-  !*** external ["wp","plugins"] ***!
-  \*********************************/
-/***/ ((module) => {
-
-module.exports = window["wp"]["plugins"];
 
 /***/ }),
 
@@ -355,6 +85,18 @@ module.exports = window["React"];
 /******/ 		};
 /******/ 	})();
 /******/ 	
+/******/ 	/* webpack/runtime/global */
+/******/ 	(() => {
+/******/ 		__webpack_require__.g = (function() {
+/******/ 			if (typeof globalThis === 'object') return globalThis;
+/******/ 			try {
+/******/ 				return this || new Function('return this')();
+/******/ 			} catch (e) {
+/******/ 				if (typeof window === 'object') return window;
+/******/ 			}
+/******/ 		})();
+/******/ 	})();
+/******/ 	
 /******/ 	/* webpack/runtime/hasOwnProperty shorthand */
 /******/ 	(() => {
 /******/ 		__webpack_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
@@ -371,6 +113,29 @@ module.exports = window["React"];
 /******/ 		};
 /******/ 	})();
 /******/ 	
+/******/ 	/* webpack/runtime/publicPath */
+/******/ 	(() => {
+/******/ 		var scriptUrl;
+/******/ 		if (__webpack_require__.g.importScripts) scriptUrl = __webpack_require__.g.location + "";
+/******/ 		var document = __webpack_require__.g.document;
+/******/ 		if (!scriptUrl && document) {
+/******/ 			if (document.currentScript && document.currentScript.tagName.toUpperCase() === 'SCRIPT')
+/******/ 				scriptUrl = document.currentScript.src;
+/******/ 			if (!scriptUrl) {
+/******/ 				var scripts = document.getElementsByTagName("script");
+/******/ 				if(scripts.length) {
+/******/ 					var i = scripts.length - 1;
+/******/ 					while (i > -1 && (!scriptUrl || !/^http(s?):/.test(scriptUrl))) scriptUrl = scripts[i--].src;
+/******/ 				}
+/******/ 			}
+/******/ 		}
+/******/ 		// When supporting browsers where an automatic publicPath is not supported you must specify an output.publicPath manually via configuration
+/******/ 		// or pass an empty string ("") and set the __webpack_public_path__ variable from your code to use your own logic.
+/******/ 		if (!scriptUrl) throw new Error("Automatic publicPath is not supported in this browser");
+/******/ 		scriptUrl = scriptUrl.replace(/^blob:/, "").replace(/#.*$/, "").replace(/\?.*$/, "").replace(/\/[^\/]+$/, "/");
+/******/ 		__webpack_require__.p = scriptUrl;
+/******/ 	})();
+/******/ 	
 /************************************************************************/
 var __webpack_exports__ = {};
 // This entry needs to be wrapped in an IIFE because it needs to be isolated against other modules in the chunk.
@@ -379,11 +144,333 @@ var __webpack_exports__ = {};
   !*** ./src/index.js ***!
   \**********************/
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _js_sidebar__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./js/sidebar */ "./src/js/sidebar.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "react");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _css_settings_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./css/settings.css */ "./src/css/settings.css");
+/* harmony import */ var _assets_appp_logo_png__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../assets/appp-logo.png */ "./assets/appp-logo.png");
+
+/* eslint-disable camelcase */
 /**
  * WordPress dependencies
  */
+const {
+  __
+} = wp.i18n;
+const {
+  BaseControl,
+  Button,
+  ExternalLink,
+  PanelBody,
+  PanelRow,
+  Placeholder,
+  Popover,
+  Spinner,
+  ToggleControl,
+  TextControl,
+  SelectControl,
+  CheckboxControl,
+  Notice
+} = wp.components;
+const {
+  render,
+  Component,
+  Fragment
+} = wp.element;
 
+/**
+ * Internal dependencies
+ */
+
+
+class App extends Component {
+  constructor() {
+    super(...arguments);
+    this.changeOptions = this.changeOptions.bind(this);
+    this.saveOptions = this.saveOptions.bind(this);
+    this.sendTestMessage = this.sendTestMessage.bind(this);
+    this.roles = [];
+    this.state = {
+      isAPILoaded: false,
+      isAPISaving: false,
+      onesignal_app_id: '',
+      onesignal_rest_api_key: '',
+      github_access_token: '',
+      onesignal_testing: false,
+      onesignal_access: [],
+      post_types_auto_push: [],
+      onesignal_segments: [],
+      onesignal_message: '',
+      roles: [],
+      postTypes: [],
+      segments: [],
+      notice: null
+    };
+  }
+  componentDidMount() {
+    // Load options
+    wp.apiRequest({
+      path: '/appsignal/v1/options'
+    }).then(options => {
+      this.setState({
+        onesignal_app_id: options.onesignal_app_id || '',
+        onesignal_rest_api_key: options.onesignal_rest_api_key || '',
+        github_access_token: options.github_access_token || '',
+        onesignal_testing: options.onesignal_testing || false,
+        onesignal_access: options.onesignal_access || [],
+        post_types_auto_push: options.post_types_auto_push || [],
+        onesignal_segments: options.onesignal_segments || []
+      });
+    });
+
+    // Load roles
+    wp.apiRequest({
+      path: '/appsignal/v1/roles'
+    }).then(roles => {
+      this.setState({
+        roles
+      });
+    });
+
+    // Load post types
+    wp.apiRequest({
+      path: '/appsignal/v1/post-types'
+    }).then(postTypes => {
+      this.setState({
+        postTypes
+      });
+    });
+
+    // Load segments
+    wp.apiRequest({
+      path: '/appsignal/v1/segments'
+    }).then(segments => {
+      this.setState({
+        segments,
+        isAPILoaded: true
+      });
+    });
+  }
+  changeOptions(option, value) {
+    this.setState({
+      [option]: value
+    });
+  }
+  saveOptions() {
+    this.setState({
+      isAPISaving: true
+    });
+    const options = {
+      onesignal_app_id: this.state.onesignal_app_id,
+      onesignal_rest_api_key: this.state.onesignal_rest_api_key,
+      github_access_token: this.state.github_access_token,
+      onesignal_testing: this.state.onesignal_testing,
+      onesignal_access: this.state.onesignal_access,
+      post_types_auto_push: this.state.post_types_auto_push,
+      onesignal_segments: this.state.onesignal_segments
+    };
+    wp.apiRequest({
+      path: '/appsignal/v1/options',
+      method: 'POST',
+      data: options
+    }).then(() => {
+      this.setState({
+        isAPISaving: false,
+        notice: {
+          type: 'success',
+          message: __('Settings saved successfully!')
+        }
+      });
+      setTimeout(() => this.setState({
+        notice: null
+      }), 3000);
+    }).catch(() => {
+      this.setState({
+        isAPISaving: false,
+        notice: {
+          type: 'error',
+          message: __('Failed to save settings.')
+        }
+      });
+    });
+  }
+  sendTestMessage() {
+    if (!this.state.onesignal_message.trim()) {
+      this.setState({
+        notice: {
+          type: 'error',
+          message: __('Please enter a test message.')
+        }
+      });
+      return;
+    }
+    wp.apiRequest({
+      path: '/appsignal/v1/test-message',
+      method: 'POST',
+      data: {
+        message: this.state.onesignal_message
+      }
+    }).then(response => {
+      this.setState({
+        notice: {
+          type: 'success',
+          message: response.message
+        },
+        onesignal_message: ''
+      });
+      setTimeout(() => this.setState({
+        notice: null
+      }), 3000);
+    }).catch(error => {
+      this.setState({
+        notice: {
+          type: 'error',
+          message: error.message || __('Failed to send test message.')
+        }
+      });
+    });
+  }
+  render() {
+    return (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(Fragment, null, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
+      className: "appsignal-header"
+    }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
+      className: "appsignal-container"
+    }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
+      className: "appsignal-logo",
+      style: {
+        display: 'flex',
+        alignItems: 'center'
+      }
+    }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
+      className: "appp-icon"
+    }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("img", {
+      style: {
+        width: '50px',
+        marginRight: '10px',
+        borderRadius: '4px'
+      },
+      src: _assets_appp_logo_png__WEBPACK_IMPORTED_MODULE_2__,
+      alt: "AppPresser"
+    })), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", null, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("h1", {
+      style: {
+        margin: '0px'
+      }
+    }, __('AppSignal')), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("p", {
+      style: {
+        margin: '10px 0px 0px 0px'
+      }
+    }, __('By AppPresser')))))), !this.state.isAPILoaded ? (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
+      className: "appsignal-spinner-center"
+    }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(Placeholder, null, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
+      className: "d-flex justify-content-center"
+    }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(Spinner, null)))) : (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
+      className: "appsignal-main"
+    }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(PanelBody, {
+      title: __('OneSignal Configuration'),
+      initialOpen: true
+    }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(PanelRow, null, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(TextControl, {
+      label: __('OneSignal App ID'),
+      value: this.state.onesignal_app_id,
+      help: (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(Fragment, null, __('The App ID for OneSignal. '), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(ExternalLink, {
+        href: "https://documentation.onesignal.com/docs/keys-and-ids",
+        target: "_blank",
+        rel: "noopener noreferrer"
+      }, __('Learn more.'))),
+      placeholder: __('OneSignal App ID'),
+      onChange: value => this.changeOptions('onesignal_app_id', value)
+    })), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(PanelRow, null, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(TextControl, {
+      label: __('OneSignal REST Key'),
+      value: this.state.onesignal_rest_api_key,
+      help: __('The OneSignal REST Secret Key. DO NOT expose this key to anyone.'),
+      placeholder: __('OneSignal REST Key'),
+      onChange: value => this.changeOptions('onesignal_rest_api_key', value)
+    }))), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(PanelBody, {
+      title: __('Access Control')
+    }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(PanelRow, null, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(BaseControl, {
+      label: __('User Role Access'),
+      help: __('Choose user roles that can access push notifications.')
+    }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
+      className: "appsignal-checkbox-group"
+    }, this.state.roles.map(role => (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(CheckboxControl, {
+      key: role.value,
+      label: role.label,
+      checked: this.state.onesignal_access.includes(role.value),
+      onChange: checked => {
+        const newAccess = checked ? [...this.state.onesignal_access, role.value] : this.state.onesignal_access.filter(r => r !== role.value);
+        this.changeOptions('onesignal_access', newAccess);
+      }
+    })))))), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(PanelBody, {
+      title: __('Post Types')
+    }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(PanelRow, null, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(BaseControl, {
+      label: __('Post Push'),
+      help: __('Choose post types to add push metabox.')
+    }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
+      className: "appsignal-checkbox-group"
+    }, this.state.postTypes.map(postType => (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(CheckboxControl, {
+      key: postType.value,
+      label: postType.label,
+      checked: this.state.post_types_auto_push.includes(postType.value),
+      onChange: checked => {
+        const newTypes = checked ? [...this.state.post_types_auto_push, postType.value] : this.state.post_types_auto_push.filter(t => t !== postType.value);
+        this.changeOptions('post_types_auto_push', newTypes);
+      }
+    })))))), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(PanelBody, {
+      title: __('Segments & Testing')
+    }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(PanelRow, null, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(ToggleControl, {
+      label: __('Testing Mode'),
+      help: (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(Fragment, null, __('Send notifications to testing segment. '), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(ExternalLink, {
+        href: "https://documentation.onesignal.com/docs/segmentation",
+        target: "_blank",
+        rel: "noopener noreferrer"
+      }, __('Learn more.'))),
+      checked: this.state.onesignal_testing,
+      onChange: checked => this.changeOptions('onesignal_testing', checked)
+    })), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(PanelRow, null, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(BaseControl, {
+      label: __('Segments'),
+      help: __('Select the segments to send notifications to.')
+    }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
+      className: "appsignal-checkbox-group"
+    }, this.state.segments.map(segment => (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(CheckboxControl, {
+      key: segment.value,
+      label: segment.label,
+      checked: this.state.onesignal_segments.includes(segment.value),
+      onChange: checked => {
+        const newSegments = checked ? [...this.state.onesignal_segments, segment.value] : this.state.onesignal_segments.filter(s => s !== segment.value);
+        this.changeOptions('onesignal_segments', newSegments);
+      }
+    })))))), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(PanelBody, {
+      title: __('Test Message')
+    }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(PanelRow, null, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(TextControl, {
+      label: __('Test Message'),
+      value: this.state.onesignal_message,
+      help: __('Send a test message to selected segments.'),
+      placeholder: __('Enter test message...'),
+      onChange: value => this.changeOptions('onesignal_message', value)
+    })), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(PanelRow, null, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
+      className: "appsignal-text-field-button-group flex-right"
+    }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(Button, {
+      isSecondary: true,
+      disabled: !this.state.onesignal_message.trim(),
+      onClick: () => this.sendTestMessage()
+    }, __('Send Test Message'))))), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
+      className: "appsignal-text-field-button-group flex-right"
+    }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(Button, {
+      isPrimary: true,
+      isLarge: true,
+      disabled: this.state.isAPISaving,
+      onClick: () => this.saveOptions(),
+      className: "save-button"
+    }, this.state.isAPISaving ? __('Saving...') : __('Save Settings'))), this.state.notice && (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
+      className: "appsignal-notice"
+    }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(Notice, {
+      status: this.state.notice.type,
+      isDismissible: true,
+      onRemove: () => this.setState({
+        notice: null
+      })
+    }, this.state.notice.message))));
+  }
+}
+render((0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(App, null), document.getElementById('appsignal'));
 })();
 
 /******/ })()
