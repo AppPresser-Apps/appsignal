@@ -2,9 +2,8 @@
 /**
  * WordPress dependencies
  */
-const { __ } = wp.i18n;
-
-const {
+import { __ } from '@wordpress/i18n';
+import {
 	BaseControl,
 	Button,
 	ExternalLink,
@@ -15,16 +14,20 @@ const {
 	Spinner,
 	ToggleControl,
 	TextControl,
+	TextareaControl,
 	SelectControl,
 	CheckboxControl,
 	Notice
-} = wp.components;
-
-const {
+} from '@wordpress/components';
+import {
 	render,
 	Component,
 	Fragment
-} = wp.element;
+} from '@wordpress/element';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { PluginDocumentSettingPanel } from '@wordpress/editor';
+import { registerPlugin } from '@wordpress/plugins';
+import apiFetch from '@wordpress/api-fetch';
 
 /**
  * Internal dependencies
@@ -32,6 +35,79 @@ const {
 import './css/settings.css';
 import apppLogo from '../assets/appp-logo.png';
 
+/**
+ * Block Editor Panel Component
+ */
+const AppSignalPanel = () => {
+	const { editPost } = useDispatch('core/editor');
+	const postMeta = useSelect((select) => {
+		return select('core/editor').getEditedPostAttribute('meta') || {};
+	}, []);
+
+	const sendNotification = postMeta['appsignal_send_notification'] || false;
+	const title = postMeta['appsignal_notification_title'] || '';
+	const message = postMeta['appsignal_notification_message'] || '';
+
+	const updateMeta = (key, value) => {
+		editPost({ meta: { [key]: value } });
+	};
+
+	return (
+		<PluginDocumentSettingPanel
+			name="appsignal-push-panel"
+			title={__('Push Notification', 'apppresser-onesignal')}
+			className="appsignal-push-panel"
+		>
+			<ToggleControl
+				label={__('Send Notification', 'apppresser-onesignal')}
+				checked={sendNotification}
+				onChange={(value) => updateMeta('appsignal_send_notification', value)}
+			/>
+			<TextControl
+				label={__('Notification Title', 'apppresser-onesignal')}
+				value={title}
+				onChange={(value) => updateMeta('appsignal_notification_title', value)}
+			/>
+			<TextareaControl
+				label={__('Notification Message', 'apppresser-onesignal')}
+				value={message}
+				onChange={(value) => updateMeta('appsignal_notification_message', value)}
+			/>
+			{sendNotification && (
+				<Button
+					isSecondary
+					style={ { width: '100%', justifyContent: 'center' } }
+					onClick={() => {
+						apiFetch({
+							path: '/appsignal/v1/send-push',
+							method: 'POST',
+							data: { title, message },
+						}).then(() => {
+							// eslint-disable-next-line no-alert
+							window.alert(__('Push notification sent!', 'apppresser-onesignal'));
+						}).catch(() => {
+							// eslint-disable-next-line no-alert
+							window.alert(__('Failed to send push notification.', 'apppresser-onesignal'));
+						});
+					}}
+					disabled={!message.trim()}
+				>
+					{__('Send Push Notification', 'apppresser-onesignal')}
+				</Button>
+			)}
+		</PluginDocumentSettingPanel>
+	);
+};
+
+if ( typeof registerPlugin === 'function' ) {
+	registerPlugin( 'appsignal-push-notification', {
+		render: AppSignalPanel,
+	} );
+}
+
+/**
+ * Plugin Settings Page Component
+ */
 class App extends Component {
 	constructor() {
 		super(...arguments);
@@ -61,8 +137,7 @@ class App extends Component {
 	}
 
 	componentDidMount() {
-		// Load options
-		wp.apiRequest({ path: '/appsignal/v1/options' }).then((options) => {
+		apiFetch({ path: '/appsignal/v1/options' }).then((options) => {
 			this.setState({
 				onesignal_app_id: options.onesignal_app_id || '',
 				onesignal_rest_api_key: options.onesignal_rest_api_key || '',
@@ -74,18 +149,15 @@ class App extends Component {
 			});
 		});
 
-		// Load roles
-		wp.apiRequest({ path: '/appsignal/v1/roles' }).then((roles) => {
+		apiFetch({ path: '/appsignal/v1/roles' }).then((roles) => {
 			this.setState({ roles });
 		});
 
-		// Load post types
-		wp.apiRequest({ path: '/appsignal/v1/post-types' }).then((postTypes) => {
+		apiFetch({ path: '/appsignal/v1/post-types' }).then((postTypes) => {
 			this.setState({ postTypes });
 		});
 
-		// Load segments
-		wp.apiRequest({ path: '/appsignal/v1/segments' }).then((segments) => {
+		apiFetch({ path: '/appsignal/v1/segments' }).then((segments) => {
 			this.setState({ segments, isAPILoaded: true });
 		});
 	}
@@ -107,7 +179,7 @@ class App extends Component {
 			onesignal_segments: this.state.onesignal_segments,
 		};
 
-		wp.apiRequest({
+		apiFetch({
 			path: '/appsignal/v1/options',
 			method: 'POST',
 			data: options
@@ -133,7 +205,7 @@ class App extends Component {
 			return;
 		}
 
-		wp.apiRequest({
+		apiFetch({
 			path: '/appsignal/v1/test-message',
 			method: 'POST',
 			data: { message: this.state.onesignal_message }
@@ -176,7 +248,6 @@ class App extends Component {
 				) : (
 					<div className="appsignal-main">
 
-						{/* OneSignal Configuration */}
 						<PanelBody title={__('OneSignal Configuration')} initialOpen={true}>
 							<PanelRow>
 								<TextControl
@@ -184,15 +255,15 @@ class App extends Component {
 									value={this.state.onesignal_app_id}
 									help={
 										<Fragment>
-										{__('The App ID for OneSignal. ' )}
-										<ExternalLink
-											href="https://documentation.onesignal.com/docs/keys-and-ids"
-											target="_blank"
-											rel="noopener noreferrer"
-										>
-											{__('Learn more.')}
-										</ExternalLink>
-									</Fragment>
+											{__('The App ID for OneSignal. ')}
+											<ExternalLink
+												href="https://documentation.onesignal.com/docs/keys-and-ids"
+												target="_blank"
+												rel="noopener noreferrer"
+											>
+												{__('Learn more.')}
+											</ExternalLink>
+										</Fragment>
 									}
 									placeholder={__('OneSignal App ID')}
 									onChange={value => this.changeOptions('onesignal_app_id', value)}
@@ -207,18 +278,8 @@ class App extends Component {
 									onChange={value => this.changeOptions('onesignal_rest_api_key', value)}
 								/>
 							</PanelRow>
-							{/* <PanelRow>
-								<TextControl
-									label={__('Github Personal Access Token')}
-									value={this.state.github_access_token}
-									help={__('Token required for plugin updates.')}
-									placeholder={__('Github Access Token')}
-									onChange={value => this.changeOptions('github_access_token', value)}
-								/>
-							</PanelRow> */}
 						</PanelBody>
 
-						{/* Access Control */}
 						<PanelBody title={__('Access Control')}>
 							<PanelRow>
 								<BaseControl
@@ -244,7 +305,6 @@ class App extends Component {
 							</PanelRow>
 						</PanelBody>
 
-						{/* Post Types */}
 						<PanelBody title={__('Post Types')}>
 							<PanelRow>
 								<BaseControl
@@ -270,14 +330,13 @@ class App extends Component {
 							</PanelRow>
 						</PanelBody>
 
-						{/* Segments and Testing */}
 						<PanelBody title={__('Segments & Testing')}>
 							<PanelRow>
 								<ToggleControl
 									label={__('Testing Mode')}
 									help={
 										<Fragment>
-											{__('Send notifications to testing segment. ' )}
+											{__('Send notifications to testing segment. ')}
 											<ExternalLink
 												href="https://documentation.onesignal.com/docs/segmentation"
 												target="_blank"
@@ -314,7 +373,7 @@ class App extends Component {
 								</BaseControl>
 							</PanelRow>
 						</PanelBody>
-						{/* Test Message */}
+
 						<PanelBody title={__('Test Message')}>
 							<PanelRow>
 								<TextControl
@@ -338,7 +397,6 @@ class App extends Component {
 							</PanelRow>
 						</PanelBody>
 
-						{/* Save Settings */}
 						<div className="appsignal-text-field-button-group flex-right">
 							<Button
 								isPrimary
@@ -351,7 +409,6 @@ class App extends Component {
 							</Button>
 						</div>
 
-						{/* Fixed Notice */}
 						{this.state.notice && (
 							<div className="appsignal-notice">
 								<Notice
@@ -371,7 +428,11 @@ class App extends Component {
 	}
 }
 
-render(
-	<App />,
-	document.getElementById('appsignal')
-);
+// Only render the settings page if the root element exists
+const settingsRoot = document.getElementById('appsignal');
+if (settingsRoot) {
+	render(
+		<App />,
+		settingsRoot
+	);
+}

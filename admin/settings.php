@@ -44,7 +44,15 @@ class Settings {
 	 */
 	public function settings_assets() {
 		wp_enqueue_style( 'appsignal-settings', APPPRESSER_ONESIGNAL_URL . 'build/index.css', array( 'wp-components' ) );
-		wp_enqueue_script( 'appsignal-settings', APPPRESSER_ONESIGNAL_URL . 'build/index.js', array( 'wp-api', 'wp-i18n', 'wp-components', 'wp-element' ), APPSIGNAL_VERSION, true );
+		$asset_file = APPPRESSER_ONESIGNAL_PATH . 'build/index.asset.php';
+		$dependencies = array( 'wp-api', 'wp-i18n', 'wp-components', 'wp-element' );
+
+		if ( file_exists( $asset_file ) ) {
+			$asset = include $asset_file;
+			$dependencies = $asset['dependencies'];
+		}
+
+		wp_enqueue_script( 'appsignal-settings', APPPRESSER_ONESIGNAL_URL . 'build/index.js', $dependencies, APPSIGNAL_VERSION, true );
 	}
 
 
