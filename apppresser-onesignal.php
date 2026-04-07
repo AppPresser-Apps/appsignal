@@ -24,6 +24,10 @@ define( 'APPPRESSER_ONESIGNAL_DIR', trailingslashit( __DIR__ ) );
 define( 'APPPRESSER_ONESIGNAL_URL', trailingslashit( plugin_dir_url( __FILE__ ) ) );
 define( 'APPPRESSER_ONESIGNAL_PATH', trailingslashit( plugin_dir_path( __FILE__ ) ) );
 
+if ( file_exists( APPPRESSER_ONESIGNAL_DIR . 'vendor/autoload.php' ) ) {
+	require_once APPPRESSER_ONESIGNAL_DIR . 'vendor/autoload.php';
+}
+
 // Include required files.
 require_once APPPRESSER_ONESIGNAL_DIR . 'admin/functions.php';
 require_once APPPRESSER_ONESIGNAL_DIR . 'includes/class-api.php';

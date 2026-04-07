@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace AppPresser\OneSignal;
 
@@ -61,7 +61,7 @@ class PostMetabox {
 			return;
 		}
 
-		$options = appsig_get_option('all');
+		$options    = appsig_get_option( 'all' );
 		$post_types = isset( $options['post_types_auto_push'] ) ? (array) $options['post_types_auto_push'] : array();
 
 		if ( empty( $post_types ) ) {
@@ -92,27 +92,27 @@ class PostMetabox {
 
 		// Get the saved meta value.
 		$send_notification = get_post_meta( $post->ID, 'appsignal_send_notification', true );
-		$title = get_post_meta( $post->ID, 'appsignal_notification_title', true );
-		$message = get_post_meta( $post->ID, 'appsignal_notification_message', true );
+		$title             = get_post_meta( $post->ID, 'appsignal_notification_title', true );
+		$message           = get_post_meta( $post->ID, 'appsignal_notification_message', true );
 		?>
 		<div class="misc-pub-section">
 			<div class="">
 				<div class="components-base-control components-checkbox-control">
 					<div class="components-base-control__field">
 						<span class="">
-							<input 
-								id="appsignal-send-notification" 
-								class="" 
-								type="checkbox" 
-								name="appsignal_send_notification" 
-								value="1" 
+							<input
+								id="appsignal-send-notification"
+								class=""
+								type="checkbox"
+								name="appsignal_send_notification"
+								value="1"
 								<?php checked( $send_notification, '1' ); ?>
 							>
 							<label class="components-checkbox-control__label" for="appsignal-send-notification">
 							<?php esc_html_e( 'Send push notification', 'apppresser-onesignal' ); ?>
 						</label>
 						</span>
-		
+
 						<p class="components-checkbox-control__help">
 							<?php esc_html_e( 'A notification will be sent when this post is updated.', 'apppresser-onesignal' ); ?>
 						</p>
@@ -132,7 +132,7 @@ class PostMetabox {
 				</div>
 
 				<div class="components-base-control__field components-base-control__field--button">
-					<button type="button" class="components-button is-primary button-secondary" id="appsignal-send-notification-button">Send Notification</button>
+					<button type="button" class="components-button button button-secondary" id="appsignal-send-notification-button">Send Notification</button>
 				</div>
 			</div>
 		</div>
@@ -265,8 +265,8 @@ class PostMetabox {
 		}
 
 		$send_notification = isset( $_POST['appsignal_send_notification'] ) && '1' === $_POST['appsignal_send_notification'];
-		$title = isset( $_POST['appsignal_notification_title'] ) ? sanitize_text_field( $_POST['appsignal_notification_title'] ) : '';
-		$message = isset( $_POST['appsignal_notification_message'] ) ? sanitize_textarea_field( $_POST['appsignal_notification_message'] ) : '';
+		$title             = isset( $_POST['appsignal_notification_title'] ) ? sanitize_text_field( $_POST['appsignal_notification_title'] ) : '';
+		$message           = isset( $_POST['appsignal_notification_message'] ) ? sanitize_textarea_field( $_POST['appsignal_notification_message'] ) : '';
 
 		// Update the meta field to reflect the checkbox state.
 		if ( $send_notification ) {
@@ -291,7 +291,6 @@ class PostMetabox {
 	 */
 	public function send_push_notification( $post_id ) {
 
-
 		if ( ! get_post_meta( $post_id, 'appsignal_send_notification', true ) ) {
 			return;
 		}
@@ -314,12 +313,11 @@ class PostMetabox {
 			$message,
 			$header,
 			'',
-			[ 'data' => array( 'post_id' => $post_id ) ]	
+			array( 'data' => array( 'post_id' => $post_id ) )
 		);
 
 		// Remove the meta value to prevent sending the notification again.
 		delete_post_meta( $post_id, 'appsignal_send_notification' );
-
 	}
 }
 

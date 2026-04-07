@@ -65,7 +65,6 @@ function push_post_type() {
 		'show_in_rest'        => false,
 	);
 	register_post_type( 'push_notification', $args );
-
 }
 add_action( 'init', 'push_post_type', 0 );
 
@@ -158,9 +157,9 @@ function appp_push_metaboxes() {
 			'id'      => 'launch_option',
 			'type'    => 'select',
 			'options' => array(
-				'none'      => esc_html__( 'Nothing', 'appsignal' ),
-				'push_url'  => esc_html__( 'Launch URL', 'appsignal' ),
-				'push_post' => esc_html__( 'Deeplink to Post', 'appsignal' ),
+				'none'     => esc_html__( 'Nothing', 'appsignal' ),
+				'push_url' => esc_html__( 'Launch URL', 'appsignal' ),
+				// 'push_post' => esc_html__( 'Deeplink to Post', 'appsignal' ),
 			),
 		)
 	);
@@ -178,25 +177,24 @@ function appp_push_metaboxes() {
 		)
 	);
 
-	$post_types = apply_filters( 'appsignal_deeplink_post_types', array( 'post' ) );
+	// $post_types = apply_filters( 'appsignal_deeplink_post_types', array( 'post' ) );
 
-	$cmb->add_field(
-		array(
-			'name'       => esc_html__( 'Deeplink Post', 'appsignal' ),
-			'desc'       => esc_html__( 'This post will open when the push notification is clicked.', 'appsignal' ),
-			'id'         => 'push_post',
-			'type'       => 'post_ajax_search',
-			'attributes' => array(
-				'data-conditional-id'    => 'launch_option',
-				'data-conditional-value' => 'push_post',
-			),
-			'query_args' => array(
-				'post_type'      => $post_types,
-				'posts_per_page' => -1,
-			),
-		)
-	);
-
+	// $cmb->add_field(
+	// array(
+	// 'name'       => esc_html__( 'Deeplink Post', 'appsignal' ),
+	// 'desc'       => esc_html__( 'This post will open when the push notification is clicked.', 'appsignal' ),
+	// 'id'         => 'push_post',
+	// 'type'       => 'post_ajax_search',
+	// 'attributes' => array(
+	// 'data-conditional-id'    => 'launch_option',
+	// 'data-conditional-value' => 'push_post',
+	// ),
+	// 'query_args' => array(
+	// 'post_type'      => $post_types,
+	// 'posts_per_page' => -1,
+	// ),
+	// )
+	// );
 }
 add_action( 'cmb2_admin_init', 'appp_push_metaboxes' );
 
@@ -350,8 +348,8 @@ function appp_send_push() {
 			break;
 		case 'push_post':
 			if ( $push_post_id ) {
-				$post      = get_post( $push_post_id );
-				$post_type = 'post' === $post->post_type ? $post->post_type . 's' : $post->post_type;
+				$post                        = get_post( $push_post_id );
+				$post_type                   = 'post' === $post->post_type ? $post->post_type . 's' : $post->post_type;
 				$options['data']['deeplink'] = '/' . $post_type . '/' . $post->post_name;
 			}
 			break;
@@ -380,7 +378,6 @@ function appp_send_push() {
 	} else {
 		wp_send_json_success( $response );
 	}
-
 }
 add_action( 'wp_ajax_appp_send_push', 'appp_send_push' );
 
